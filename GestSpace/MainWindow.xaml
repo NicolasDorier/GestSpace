@@ -1,0 +1,48 @@
+﻿<Window x:Class="GestSpace.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:GestSpace.Controls;assembly=GestSpace.Controls"
+        AllowsTransparency="True" 
+        Opacity="1"
+        WindowStyle="None" 
+        Background="Transparent"
+        KeyDown="Window_KeyDown"
+        >
+    <Grid x:Name="root">
+        <controls:HexCanvas x:Name="canvas" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <controls:Hex controls:HexCanvas.LeftHex="0" Width="200" controls:HexCanvas.TopHex="4" MouseDown="Hex_MouseDown">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Path  Fill="White" Stretch="Uniform"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Data="M 0 50 L 20 50 L 20 0 L 40 0 L 40 50 L 60 50 L 30 100 Z"></Path>
+                    
+                    <TextBlock Grid.Row="1" Grid.Column="1"
+                               HorizontalAlignment="Center"
+                               FontWeight="ExtraLight"
+                               FontSize="15"
+                               Margin="0,5,0,0"
+                               VerticalAlignment="Top"
+                               >3 Fingers down</TextBlock>
+                </Grid>
+            </controls:Hex>
+
+            <controls:Hex x:Name="hex2" controls:HexCanvas.LeftHex="0" controls:HexCanvas.TopHex="5" MouseDown="Hex_MouseDown">
+                <TextBlock Text="0,5"></TextBlock>
+            </controls:Hex>
+            <controls:Hex  controls:HexCanvas.LeftHex="0"  controls:HexCanvas.TopHex="6" MouseDown="Hex_MouseDown">
+                <TextBlock Text="0,5"></TextBlock>
+            </controls:Hex>
+            <controls:Hex BorderBrush="Green"  controls:HexCanvas.LeftHex="-1" controls:HexCanvas.TopHex="5" MouseDown="Hex_MouseDown">
+                <TextBlock Text="0,5"></TextBlock>
+            </controls:Hex>
+    
+
+        </controls:HexCanvas>
+        <TextBlock x:Name="center" Text="" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+    </Grid>
+</Window>
