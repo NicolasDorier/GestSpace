@@ -1,6 +1,7 @@
 ﻿<Application x:Class="GestSpace.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:GestSpace"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <Style TargetType="{x:Type TextBlock}">
@@ -8,5 +9,26 @@
             <Setter Property="Foreground" Value="White"></Setter>
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
         </Style>
+        
+        <DataTemplate DataType="{x:Type local:TileViewModel}">
+            <local:TileView></local:TileView>
+        </DataTemplate>
+
+        <PathGeometry x:Key="ArrowGeometry" Figures="M 0 50 L 20 50 L 20 0 L 40 0 L 40 50 L 60 50 L 30 100 Z"></PathGeometry>
+        <CombinedGeometry x:Key="VolumeGeometry" GeometryCombineMode="Intersect">
+            <CombinedGeometry.Geometry1>
+                <PathGeometry Figures="
+                                 M 10  0 L 10  5 L 40  5 L 40  0 Z 
+                                 M 10 10 L 10 15 L 40 15 L 40 10 Z
+                                 M 10 20 L 10 25 L 40 25 L 40 20 Z
+                                 M 10 30 L 10 35 L 40 35 L 40 30 Z
+                                 M 10 40 L 10 45 L 40 45 L 40 40 Z">
+                </PathGeometry>
+            </CombinedGeometry.Geometry1>
+            <CombinedGeometry.Geometry2>
+                <PathGeometry Figures="M 10 0 L 40 0 L 25 45 Z">
+                </PathGeometry>
+            </CombinedGeometry.Geometry2>
+        </CombinedGeometry>
     </Application.Resources>
 </Application>

@@ -7,42 +7,38 @@
         WindowStyle="None" 
         Background="Transparent"
         KeyDown="Window_KeyDown"
+        xmlns:local="clr-namespace:GestSpace"
         >
     <Grid x:Name="root">
-        <controls:HexCanvas x:Name="canvas" Width="200" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <controls:Hex controls:HexCanvas.LeftHex="0" Width="200" controls:HexCanvas.TopHex="4" MouseDown="Hex_MouseDown">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Path  Fill="White" Stretch="Uniform"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Data="M 0 50 L 20 50 L 20 0 L 40 0 L 40 50 L 60 50 L 30 100 Z"></Path>
-                    
-                    <TextBlock Grid.Row="1" Grid.Column="1"
-                               HorizontalAlignment="Center"
-                               FontWeight="ExtraLight"
-                               FontSize="15"
-                               Margin="0,5,0,0"
-                               VerticalAlignment="Top"
-                               >3 Fingers down</TextBlock>
-                </Grid>
-            </controls:Hex>
-
-            <controls:Hex x:Name="hex2" controls:HexCanvas.LeftHex="0" controls:HexCanvas.TopHex="5" MouseDown="Hex_MouseDown">
-                <TextBlock Text="0,5"></TextBlock>
-            </controls:Hex>
-            <controls:Hex  controls:HexCanvas.LeftHex="0"  controls:HexCanvas.TopHex="6" MouseDown="Hex_MouseDown">
-                <TextBlock Text="0,5"></TextBlock>
-            </controls:Hex>
-            <controls:Hex BorderBrush="Green"  controls:HexCanvas.LeftHex="-1" controls:HexCanvas.TopHex="5" MouseDown="Hex_MouseDown">
-                <TextBlock Text="0,5"></TextBlock>
-            </controls:Hex>
-    
-
-        </controls:HexCanvas>
+        <ListBox x:Name="list" 
+                 ItemsSource="{Binding Tiles}" 
+                 SelectedItem="{Binding CurrentTile, Mode=TwoWay}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <controls:HexCanvas HorizontalAlignment="Left" VerticalAlignment="Top" Width="200"></controls:HexCanvas>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.Template>
+                <ControlTemplate>
+                    <ItemsPresenter></ItemsPresenter>
+                </ControlTemplate>
+            </ListBox.Template>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalAlignment" Value="Left"></Setter>
+                    <Setter Property="VerticalAlignment" Value="Top"></Setter>
+                    <Setter Property="controls:HexCanvas.LeftHex" Value="{Binding Position.X}"></Setter>
+                    <Setter Property="controls:HexCanvas.TopHex" Value="{Binding Position.Y}"></Setter>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter Content="{TemplateBinding Content}"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"></ContentPresenter>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle> </ListBox>
         <TextBlock x:Name="center" Text="" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
     </Grid>
 </Window>

@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="GestSpace.TileView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:controls="clr-namespace:GestSpace.Controls;assembly=GestSpace.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d"
+             >
+    <controls:Hex x:Name="hex" Width="200">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="ControlStates">
+                <VisualState x:Name="NotSelectedState">
+                    <Storyboard>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="SelectedState">
+                    <Storyboard>
+                        <ColorAnimation Storyboard.TargetName="hex"  
+                                        Storyboard.TargetProperty="(Control.Background).(SolidColorBrush.Color)"
+                                        To="#FF111111"
+                                        Duration="0"></ColorAnimation>
+                    </Storyboard>
+                </VisualState>
+                <VisualStateGroup.Transitions>
+                    <VisualTransition GeneratedDuration="0:0:0.3"></VisualTransition>
+                </VisualStateGroup.Transitions>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Path  Fill="White" Stretch="Uniform"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Data="M 0 50 L 20 50 L 20 0 L 40 0 L 40 50 L 60 50 L 30 100 Z"></Path>
+            <TextBlock Grid.Row="1" Grid.Column="1"
+                               HorizontalAlignment="Center"
+                               FontWeight="ExtraLight"
+                               FontSize="15"
+                               Margin="0,5,0,0"
+                               VerticalAlignment="Top"
+                               >3 Fingers down</TextBlock>
+        </Grid>
+    </controls:Hex>
+</UserControl>

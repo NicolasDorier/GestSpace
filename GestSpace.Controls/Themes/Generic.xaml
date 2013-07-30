@@ -6,8 +6,8 @@
 
     <Style TargetType="{x:Type local:Hex}">
         <Setter Property="BorderThickness" Value="3"></Setter>
-        <Setter Property="BorderBrush" Value="Black"></Setter>
-        <Setter Property="Background" Value="#CC080808"></Setter>
+        <Setter Property="BorderBrush" Value="White"></Setter>
+        <Setter Property="Background" Value="#CC060606"></Setter>
         <Setter Property="Foreground" Value="White"></Setter>
         <Setter Property="FontSize" Value="15"></Setter>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
