@@ -118,8 +118,10 @@ namespace GestSpace
 			var animation = CreateDoubleAnimation(1.0, new Duration(TimeSpan.FromSeconds(0.5)));
 			this.BeginAnimation(OpacityProperty, animation);
 		}
-
-
+		private double RadianToDegree(double angle)
+		{
+			return angle * (180.0 / Math.PI);
+		}
 		ReactiveListener listener;
 		void MainWindow_Loaded(object sender, RoutedEventArgs e)
 		{
@@ -128,28 +130,49 @@ namespace GestSpace
 			controller = new Controller(listener);
 
 
+			listener
+				.FingersMoves
+				.SelectMany(f => f)
+				.SkipUntil(Observable.Interval(TimeSpan.FromMilliseconds(600)))
+				.Buffer(20)
+				.Where(b => b.Count > 0)
+				.Select(v => new System.Windows.Vector(v.Average(m => m.Direction.x), v.Average(m => m.Direction.y)))
+				.Where(v => v.Length > 0.5)
+				.Take(1)
+				.Repeat()
+				.ObserveOn(SynchronizationContext.Current)
+				.Subscribe(vector =>
+				{
+
+					var move = vector;
+					Console.WriteLine("Magnitude " + move.Length);
+					if(move.Length > 0.4)
+					{
+						var angle = RadianToDegree(Math.Atan2(move.Y, move.X));
+						ViewModel.SelectTile(angle);
+					}
+
+				});
+
 			var gesturesById = listener
 			.Gestures
 			.Where(g => g.Key.Type == Gesture.GestureType.TYPECIRCLE)
-			.Select(g => new
+			.SelectMany(g => g.ToList().Select(l => new
+												{
+													Key = g.Key,
+													Values = l
+												}))
+			.Do(g => Console.WriteLine("Finished " + g.Key.Id))
+			.Buffer(() => listener.Gestures.OnlyTimeout(TimeSpan.FromMilliseconds(1000)))
+			.Subscribe(l =>
 			{
-				Key = g.Key,
-				Values = g.ToList()
-			}).SelectMany(kv => kv.Values);
-
-
-			gesturesById
-							.Do(g => Console.WriteLine("Finished " + g.First().Id))
-							.Buffer(() => gesturesById.OnlyTimeout(TimeSpan.FromMilliseconds(1000)))
-							.Subscribe(l =>
-							{
-								if(l.Count != 0)
-								{
-									var distinct = l.SelectMany(oo => oo.SelectMany(o => o.Pointables)).Select(p => p.Id).Distinct().Count();
-									Console.WriteLine("Gesture ! (" + l.Count + " - " + distinct + ")");
-									Console.WriteLine("---");
-								}
-							});
+				if(l.Count != 0)
+				{
+					var distinct = l.SelectMany(oo => oo.Values.SelectMany(o => o.Pointables)).Select(p => p.Id).Distinct().Count();
+					Console.WriteLine("Gesture ! (" + l.Count + " - " + distinct + ")");
+					Console.WriteLine("---");
+				}
+			});
 
 
 			Maximize();
@@ -165,6 +188,8 @@ namespace GestSpace
 
 		private void Center(FrameworkElement hex)
 		{
+			if(hex == null)
+				return;
 			var centerPoint = center.TranslatePoint(new Point(0, 0), root);
 			var hexPoint = hex.TranslatePoint(new Point(hex.ActualWidth / 2.0, hex.ActualHeight / 2.0), root);
 			var transform = list.RenderTransform as TranslateTransform; // = new TranslateTransform(centerPoint.X - hexPoint.X, centerPoint.Y - hexPoint.Y);

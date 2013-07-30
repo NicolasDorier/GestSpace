@@ -16,7 +16,7 @@ namespace GestSpace
 		MainWindow window;
 		public ReactiveListener(MainWindow window)
 		{
-		
+
 			this.window = window;
 			Frames = NewFrameDetected;
 			Gestures = Frames
@@ -57,7 +57,6 @@ namespace GestSpace
 		{
 			NewFrameDetected.OnNext(arg0.Frame());
 		}
-
 
 		Subject<Frame> NewFrameDetected = new Subject<Frame>();
 	}

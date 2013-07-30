@@ -41,7 +41,7 @@
                                FontSize="15"
                                Margin="0,5,0,0"
                                VerticalAlignment="Top"
-                               >3 Fingers down</TextBlock>
+                               Text="{Binding Position}"></TextBlock>
         </Grid>
     </controls:Hex>
 </UserControl>
