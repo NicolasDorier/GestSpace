@@ -51,6 +51,7 @@ namespace GestSpace
 			controller.EnableGesture(Gesture.GestureType.TYPEKEYTAP);
 			controller.EnableGesture(Gesture.GestureType.TYPESCREENTAP);
 			controller.EnableGesture(Gesture.GestureType.TYPESWIPE);
+			controller.SetPolicyFlags(Controller.PolicyFlag.POLICYBACKGROUNDFRAMES);
 		}
 
 		public override void OnFrame(Controller arg0)

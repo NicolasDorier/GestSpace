@@ -106,14 +106,20 @@ namespace GestSpace
 			DependencyProperty.Register("ViewModel", typeof(MainViewModel), typeof(MainWindow), new PropertyMetadata(null));
 
 
-
+		volatile bool _Maximized;
 		private void Minimize()
 		{
+			if(!_Maximized)
+				return;
+			_Maximized = false;
 			var animation = CreateDoubleAnimation(0.0, new Duration(TimeSpan.FromSeconds(0.5)));
 			this.BeginAnimation(OpacityProperty, animation);
 		}
 		private void Maximize()
 		{
+			if(_Maximized)
+				return;
+			_Maximized = true;
 			WindowState = System.Windows.WindowState.Maximized;
 			var animation = CreateDoubleAnimation(1.0, new Duration(TimeSpan.FromSeconds(0.5)));
 			this.BeginAnimation(OpacityProperty, animation);
@@ -129,49 +135,55 @@ namespace GestSpace
 			listener = new ReactiveListener(this);
 			controller = new Controller(listener);
 
+			listener
+				.FingersMoves
+				.SelectMany(m => m)
+				.Select((m) => false)
+				.OnlyTimeout(TimeSpan.FromSeconds(3))
+				.Repeat()
+				.ObserveOn(SynchronizationContext.Current)
+				.Subscribe(b =>
+				{
+					Minimize();
+				});
+				
 
 			listener
 				.FingersMoves
-				.SelectMany(f => f)
-				.SkipUntil(Observable.Interval(TimeSpan.FromMilliseconds(600)))
-				.Buffer(20)
-				.Where(b => b.Count > 0)
-				.Select(v => new System.Windows.Vector(v.Average(m => m.Direction.x), v.Average(m => m.Direction.y)))
-				.Where(v => v.Length > 0.5)
-				.Take(1)
+				.DoWhile(() => _Maximized)
+					.SelectMany(f => f)
+					.SkipUntil(Observable.Interval(TimeSpan.FromMilliseconds(600)))
+					.Buffer(20)
+					.Where(b => b.Count > 0)
+					.Select(v => new System.Windows.Vector(v.Average(m => m.Direction.x), v.Average(m => m.Direction.y)))
+					.Where(v => v.Length > 0.4)
+					.Take(1)
 				.Repeat()
 				.ObserveOn(SynchronizationContext.Current)
 				.Subscribe(vector =>
 				{
-
-					var move = vector;
-					Console.WriteLine("Magnitude " + move.Length);
-					if(move.Length > 0.4)
-					{
-						var angle = RadianToDegree(Math.Atan2(move.Y, move.X));
-						ViewModel.SelectTile(angle);
-					}
+					var angle = RadianToDegree(Math.Atan2(vector.Y, vector.X));
+					ViewModel.SelectTile(angle);
 
 				});
 
 			var gesturesById = listener
 			.Gestures
-			.Where(g => g.Key.Type == Gesture.GestureType.TYPECIRCLE)
-			.SelectMany(g => g.ToList().Select(l => new
-												{
-													Key = g.Key,
-													Values = l
-												}))
-			.Do(g => Console.WriteLine("Finished " + g.Key.Id))
-			.Buffer(() => listener.Gestures.OnlyTimeout(TimeSpan.FromMilliseconds(1000)))
+			.TakeWhile((i) => !_Maximized)
+				.Where(g => g.Key.Type == Gesture.GestureType.TYPECIRCLE)
+				.SelectMany(g => g.ToList().Select(l => new
+													{
+														Key = g.Key,
+														Values = l
+													}))
+				.Buffer(() => listener.Gestures.OnlyTimeout(TimeSpan.FromMilliseconds(700)))
+				.Where(b => b.Count > 0)
+			.Repeat()
+			.ObserveOn(SynchronizationContext.Current)
 			.Subscribe(l =>
 			{
-				if(l.Count != 0)
-				{
-					var distinct = l.SelectMany(oo => oo.Values.SelectMany(o => o.Pointables)).Select(p => p.Id).Distinct().Count();
-					Console.WriteLine("Gesture ! (" + l.Count + " - " + distinct + ")");
-					Console.WriteLine("---");
-				}
+				var distinct = l.SelectMany(oo => oo.Values.SelectMany(o => o.Pointables)).Select(p => p.Id).Distinct().Count();
+				Maximize();
 			});
 
 
