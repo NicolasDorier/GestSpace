@@ -24,7 +24,6 @@
                              Stretch="UniformToFill">
                         </Polygon>
                         <ContentPresenter Content="{TemplateBinding Content}" 
-                                          Margin="0,10,0,0"
                                           ContentTemplate="{TemplateBinding ContentTemplate}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}" ></ContentPresenter>

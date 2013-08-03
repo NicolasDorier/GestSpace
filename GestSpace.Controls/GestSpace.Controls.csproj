@@ -47,6 +47,8 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoArrangeGrid.cs" />
+    <Compile Include="ControlAdorner.cs" />
     <Compile Include="Hex.cs" />
     <Compile Include="HexCanvas.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

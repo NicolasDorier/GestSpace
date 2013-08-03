@@ -72,7 +72,7 @@
                                   Content="{Binding Action.Presenter}"></ContentPresenter>
 
                 <TextBlock Grid.Row="1" Grid.Column="1"
-                           Margin="0,100,0,0"
+                           Margin="0,105,0,0"
                                HorizontalAlignment="Center"
                                FontWeight="ExtraLight"
                                FontSize="15"
