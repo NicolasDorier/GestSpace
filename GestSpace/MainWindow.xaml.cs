@@ -1,4 +1,5 @@
-﻿using GestSpace.Controls;
+﻿using CoreAudioApi;
+using GestSpace.Controls;
 using Leap;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WindowsInput;
 
 namespace GestSpace
 {
@@ -31,7 +33,13 @@ namespace GestSpace
 		public MainWindow()
 		{
 			InitializeComponent();
-			ViewModel = new MainViewModel();
+
+			listener = new ReactiveListener();
+			var spaceListener = new ReactiveSpace(listener);
+
+			controller = new Controller(listener);
+
+			ViewModel = new MainViewModel(spaceListener);
 			root.SetBinding(Grid.DataContextProperty, new Binding()
 			{
 				Source = this,
@@ -42,7 +50,6 @@ namespace GestSpace
 				Source = this,
 				Path = new PropertyPath("ViewModel.CurrentTile")
 			});
-
 			this.Loaded += MainWindow_Loaded;
 			this.Closed += MainWindow_Closed;
 		}
@@ -124,16 +131,36 @@ namespace GestSpace
 			var animation = CreateDoubleAnimation(1.0, new Duration(TimeSpan.FromSeconds(0.5)));
 			this.BeginAnimation(OpacityProperty, animation);
 		}
-		private double RadianToDegree(double angle)
-		{
-			return angle * (180.0 / Math.PI);
-		}
+	
 		ReactiveListener listener;
 		void MainWindow_Loaded(object sender, RoutedEventArgs e)
 		{
-			Center();
-			listener = new ReactiveListener(this);
-			controller = new Controller(listener);
+			//var a = GestSpace.Interop.user32.CountVisibleWindows();
+			//InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+			//InputSimulator.SimulateKeyDown(VirtualKeyCode.TAB);
+
+			var ui = SynchronizationContext.Current;
+
+			listener.Frames
+					.Timestamp()
+					.Buffer(2)
+					.ObserveOn(ui)
+					.Subscribe(o =>
+					{
+						var seconds = (o[1].Timestamp - o[0].Timestamp).TotalSeconds;
+						ViewModel.Debug.FPS = (int)(1.0 / seconds);
+					});
+
+			listener.FingersMoves
+					.ObserveOn(ui)
+					.Do(o => ViewModel.Debug.FingerCount++)
+					.Select(f => f.ObserveOn(ui).Subscribe(o =>
+					{
+
+					}, () =>
+					{
+						ViewModel.Debug.FingerCount--;
+					})).Subscribe();
 
 			listener
 				.FingersMoves
@@ -144,52 +171,105 @@ namespace GestSpace
 				.ObserveOn(SynchronizationContext.Current)
 				.Subscribe(b =>
 				{
-					Minimize();
+					//Minimize();
 				});
-				
 
+
+
+			ViewModel.SpaceListener
+				.IsLocked
+				.ObserveOn(ui)
+				.Subscribe(locked =>
+				{
+					ViewModel.CurrentTile.IsLocked = locked;
+				});
+
+			
+
+			var centers =
+				listener
+				.FingersMoves
+				.SelectMany(f => f)
+				.Buffer(TimeSpan.FromMilliseconds(200), TimeSpan.FromMilliseconds(100))
+				.Where(b => b.Count > 0)
+				.Select(v => new Leap.Vector(v.Average(m => m.TipPosition.x), v.Average(m => m.TipPosition.y), 0.0f));
+
+
+			//new System.Windows.Vector(v.Average(m => m.Direction.x), v.Average(m => m.Direction.y))
 			listener
 				.FingersMoves
-				.DoWhile(() => _Maximized)
-					.SelectMany(f => f)
-					.SkipUntil(Observable.Interval(TimeSpan.FromMilliseconds(600)))
-					.Buffer(20)
-					.Where(b => b.Count > 0)
-					.Select(v => new System.Windows.Vector(v.Average(m => m.Direction.x), v.Average(m => m.Direction.y)))
-					.Where(v => v.Length > 0.4)
-					.Take(1)
-				.Repeat()
-				.ObserveOn(SynchronizationContext.Current)
-				.Subscribe(vector =>
+				.SelectMany(f => f)
+				.Select(v => v.TipPosition)
+				.CombineLatest(centers, ViewModel.SpaceListener.IsLocked, (p, center, locked) => new
 				{
-					var angle = RadianToDegree(Math.Atan2(vector.Y, vector.X));
-					ViewModel.SelectTile(angle);
-
+					Center = center,
+					Position = To2d(p),
+					Move = To2d(p) - center,
+					Locked = locked
+				})
+				.Where(o => o.Move.Magnitude >= 50.0)
+				.Sample(TimeSpan.FromMilliseconds(500))
+				.Where(p=>!p.Locked)
+				.ObserveOn(ui)
+				.Subscribe(o =>
+				{
+					if(ViewModel.Debug.FingerCount <= 2)
+					{
+						var angle = Helper.RadianToDegree(Math.Atan2(o.Move.y, o.Move.x));
+						ViewModel.SelectTile(angle);
+					}
 				});
+
+			//.Where((i) => _Maximized)
+			//	.SelectMany(f => f)
+			//	.SkipUntil(Observable.Interval(TimeSpan.FromMilliseconds(600)))
+			//		.Buffer(20)
+			//		.Select(v => new System.Windows.Vector(v.Average(m => m.Direction.x), v.Average(m => m.Direction.y)))
+			//		.Where(v => v.Length > 0.4)
+			//		.Take(1)
+			//.Repeat()
+			//.ObserveOn(SynchronizationContext.Current)
+			//.Subscribe(vector =>
+			//{
+			//	var angle = RadianToDegree(Math.Atan2(vector.Y, vector.X));
+			//	ViewModel.SelectTile(angle);
+
+			//});
 
 			var gesturesById = listener
 			.Gestures
-			.TakeWhile((i) => !_Maximized)
+			.Where((o) => !false)
 				.Where(g => g.Key.Type == Gesture.GestureType.TYPECIRCLE)
 				.SelectMany(g => g.ToList().Select(l => new
 													{
 														Key = g.Key,
 														Values = l
 													}))
+				//.SkipUntil(Observable.Interval(TimeSpan.FromMilliseconds(600)))
 				.Buffer(() => listener.Gestures.OnlyTimeout(TimeSpan.FromMilliseconds(700)))
 				.Where(b => b.Count > 0)
+				.Take(1)
 			.Repeat()
 			.ObserveOn(SynchronizationContext.Current)
 			.Subscribe(l =>
 			{
+
 				var distinct = l.SelectMany(oo => oo.Values.SelectMany(o => o.Pointables)).Select(p => p.Id).Distinct().Count();
+				Console.WriteLine("Gesture " + distinct);
 				Maximize();
 			});
 
 
 			Maximize();
-			//Center(hex2);
+			Center();
 		}
+
+		Leap.Vector To2d(Leap.Vector vector)
+		{
+			Leap.Vector v = new Leap.Vector(vector.x, vector.y, 0);
+			return v;
+		}
+
 
 		void MainWindow_Closed(object sender, EventArgs e)
 		{

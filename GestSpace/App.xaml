@@ -9,10 +9,7 @@
             <Setter Property="Foreground" Value="White"></Setter>
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
         </Style>
-        
-        <DataTemplate DataType="{x:Type local:TileViewModel}">
-            <local:TileView></local:TileView>
-        </DataTemplate>
+
 
         <PathGeometry x:Key="ArrowGeometry" Figures="M 0 50 L 20 50 L 20 0 L 40 0 L 40 50 L 60 50 L 30 100 Z"></PathGeometry>
         <CombinedGeometry x:Key="VolumeGeometry" GeometryCombineMode="Intersect">
@@ -30,5 +27,90 @@
                 </PathGeometry>
             </CombinedGeometry.Geometry2>
         </CombinedGeometry>
+
+        <PathGeometry x:Key="MoveUpDownGeometry" Figures="M 0 70 L 50 0 L 100 70 L 70 70 L 50 45 L 30 70 Z
+                            M 0 100 L 50 30 L 100 100 L 70 100 L 50 75 L 30 100 Z
+                            M 0 150 L 50 220 L 100 150 L 70 150 L 50 175 L 30 150 Z
+                            M 0 180 L 50 250 L 100 180 L 70 180 L 50 205 L 30 180 Z"></PathGeometry>
+        
+        <PathGeometry x:Key="PlusGeometry" Figures="M 20 20 
+                                     L 0 20    0 30  20 30
+                                     L 20 50  30 50  30 30
+                                     L 50 30  50 20  30 20
+                                     L 30  0  20  0 Z" ></PathGeometry>
+        
+
+        <DataTemplate DataType="{x:Type local:TileViewModel}">
+            <local:TileView></local:TileView>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:ValuePresenterViewModel}">
+            <local:ValuePresenterView></local:ValuePresenterView>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type local:UnusedPresenterViewModel}">
+            <Path Fill="White" Height="25" Data="{StaticResource PlusGeometry}" Stretch="Uniform"></Path>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type local:MovePresenterViewModel}">
+            <Path Fill="White" Data="{StaticResource MoveUpDownGeometry}" Stretch="Uniform"></Path>
+        </DataTemplate>
+
+
+
+        <Style x:Key="GeometryBar" TargetType="ProgressBar">
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Path 
+                            x:Name="track"
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Stretch"
+                            Stretch="Uniform"
+                            Fill="{TemplateBinding Foreground}"
+                            Data="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:ProgressBarExtensions.Geometry)}"></Path>
+
+                                <Canvas
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Top"
+                                Width="{Binding ElementName=track, Path=ActualWidth}"
+                                
+                                ClipToBounds="True">
+                                    <Canvas.Height>
+                                        <MultiBinding>
+                                            <MultiBinding.Converter>
+                                                <local:SubstractionConverter></local:SubstractionConverter>
+                                            </MultiBinding.Converter>
+                                            <Binding ElementName="PART_Track" Path="ActualWidth"></Binding>
+                                            <Binding ElementName="PART_Indicator" Path="ActualWidth"></Binding>
+                                        </MultiBinding>
+                                    </Canvas.Height>
+                                    <!--Height="{Binding ElementName=PART_Indicator, Path=ActualWidth}"-->
+                                    <Path 
+                            
+                            Stretch="Uniform"
+                            Width="{Binding ElementName=track, Path=ActualWidth}"
+                            Height="{Binding ElementName=track, Path=ActualHeight}"
+                            Fill="{TemplateBinding Background}"
+                            Data="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(local:ProgressBarExtensions.Geometry)}">
+
+                                    </Path>
+                                </Canvas>
+
+                                <Rectangle x:Name="PART_Track" MaxWidth="{Binding ElementName=track, Path=ActualHeight}" Fill="Transparent"></Rectangle>
+                            
+                                <Rectangle  x:Name="PART_Indicator" MaxWidth="{Binding ElementName=track, Path=ActualHeight}"  Fill="Transparent"></Rectangle>
+                                <Rectangle Width="{Binding ElementName=track, Path=ActualHeight}" Fill="Transparent"></Rectangle>
+                            </Grid>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Application.Resources>
 </Application>

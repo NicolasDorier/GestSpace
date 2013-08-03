@@ -3,16 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:controls="clr-namespace:GestSpace.Controls;assembly=GestSpace.Controls"
+             xmlns:local="clr-namespace:GestSpace"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d"
              >
     <controls:Hex x:Name="hex" Width="200">
         <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="ControlStates">
-                <VisualState x:Name="NotSelectedState">
-                    <Storyboard>
-                    </Storyboard>
-                </VisualState>
+            <VisualStateGroup x:Name="SelectionStates">
+                <VisualState x:Name="NotSelectedState"></VisualState>
                 <VisualState x:Name="SelectedState">
                     <Storyboard>
                         <ColorAnimation Storyboard.TargetName="hex"  
@@ -25,23 +23,62 @@
                     <VisualTransition GeneratedDuration="0:0:0.3"></VisualTransition>
                 </VisualStateGroup.Transitions>
             </VisualStateGroup>
+            <VisualStateGroup x:Name="LockedStates">
+                <VisualState x:Name="NotLocked"></VisualState>
+                <VisualState x:Name="Locked">
+                    <Storyboard>
+                        <DoubleAnimation Storyboard.TargetName="lockedGrid"  
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="1"
+                                        Duration="0"></DoubleAnimation>
+                    </Storyboard>
+                </VisualState>
+                <VisualStateGroup.Transitions>
+                    <VisualTransition GeneratedDuration="0:0:0.1"></VisualTransition>
+                </VisualStateGroup.Transitions>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="UsedStates">
+                <VisualState x:Name="Unused">
+                    <Storyboard>
+                        <DoubleAnimation Storyboard.TargetName="hex"  
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="0.5"
+                                        Duration="0"></DoubleAnimation>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="Used"></VisualState>
+                <VisualStateGroup.Transitions>
+                    <VisualTransition GeneratedDuration="0:0:0.3"></VisualTransition>
+                </VisualStateGroup.Transitions>
+            </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
+
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Path  Fill="White" Stretch="Uniform"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Data="M 0 50 L 20 50 L 20 0 L 40 0 L 40 50 L 60 50 L 30 100 Z"></Path>
-            <TextBlock Grid.Row="1" Grid.Column="1"
+            <Grid x:Name="lockedGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0">
+                <controls:Hex Background="Transparent" Width="180"></controls:Hex>
+            </Grid>
+            <Grid x:Name="usedGrid">
+                <!--<Path HorizontalAlignment="Center" 
+                      Height="75"
+                      Stretch="Uniform"
+                      Data="M 0 70 L 50 0 L 100 70 L 70 70 L 50 45 L 30 70 Z
+                            M 0 100 L 50 30 L 100 100 L 70 100 L 50 75 L 30 100 Z
+                            M 0 150 L 50 220 L 100 150 L 70 150 L 50 175 L 30 150 Z
+                            M 0 180 L 50 250 L 100 180 L 70 180 L 50 205 L 30 180 Z" Fill="White"></Path>-->
+                    
+                <ContentPresenter Height="75"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Content="{Binding Action.Presenter}"></ContentPresenter>
+
+                <TextBlock Grid.Row="1" Grid.Column="1"
+                           Margin="0,100,0,0"
                                HorizontalAlignment="Center"
                                FontWeight="ExtraLight"
                                FontSize="15"
-                               Margin="0,5,0,0"
-                               VerticalAlignment="Top"
-                               Text="{Binding Position}"></TextBlock>
+                               VerticalAlignment="Center"
+                               Text="{Binding Description}"></TextBlock>
+            </Grid>
         </Grid>
     </controls:Hex>
 </UserControl>

@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="GestSpace.TileConfigView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:controls="clr-namespace:GestSpace.Controls;assembly=GestSpace.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             >
+    <UserControl.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="MinWidth" Value="200"></Setter>
+            <Setter Property="MaxWidth" Value="200"></Setter>
+            <Setter Property="Margin" Value="10,0,0,10"></Setter>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"></Setter>
+            <Setter Property="VerticalAlignment" Value="Top"></Setter>
+            <Setter Property="Foreground" Value="White"></Setter>
+            <Setter Property="Margin" Value="0,0,0,10"></Setter>
+        </Style>
+    </UserControl.Resources>
+    <Border 
+        Background="#CC060606" 
+        BorderThickness="3"
+        Padding="20"
+        BorderBrush="White" >
+        <controls:AutoArrangeGrid>
+            <controls:AutoArrangeGrid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </controls:AutoArrangeGrid.ColumnDefinitions>
+            <TextBlock Text="Name"></TextBlock>
+            <TextBox></TextBox>
+            <TextBlock Text="Gesture"></TextBlock>
+            <TextBox></TextBox>
+            <TextBlock Text="Action"></TextBlock>
+            <TextBox></TextBox>
+        </controls:AutoArrangeGrid>
+    </Border>
+</UserControl>

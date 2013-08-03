@@ -13,11 +13,9 @@ namespace GestSpace
 	public class ReactiveListener : Listener
 	{
 
-		MainWindow window;
-		public ReactiveListener(MainWindow window)
+		
+		public ReactiveListener()
 		{
-
-			this.window = window;
 			Frames = NewFrameDetected;
 			Gestures = Frames
 							.SelectMany(f => f.Gestures())
@@ -25,6 +23,8 @@ namespace GestSpace
 			FingersMoves = Frames
 							.SelectMany(f => f.Fingers)
 							.GroupByUntil(f => f, f => f.OnlyTimeout(TimeSpan.FromMilliseconds(300)), AnonymousComparer.Create((Finger g) => g.Id));
+
+			HandsMoves = GetHandsMoves(h => false);
 		}
 
 		public IObservable<Frame> Frames
@@ -33,7 +33,20 @@ namespace GestSpace
 			private set;
 		}
 
+		public IObservable<IGroupedObservable<Hand, Hand>> GetHandsMoves(Func<Hand, bool> until)
+		{
+			return Frames
+							.SelectMany(f => f.Hands)
+							.GroupByUntil(f => f, f => f.OnlyTimeout(TimeSpan.FromMilliseconds(300))
+														.Amb(f.Where(until).Select(t => true).Take(1)), AnonymousComparer.Create((Hand hand) => hand.Id));
+		}
+
 		public IObservable<IGroupedObservable<Finger, Finger>> FingersMoves
+		{
+			get;
+			private set;
+		}
+		public IObservable<IGroupedObservable<Hand, Hand>> HandsMoves
 		{
 			get;
 			private set;

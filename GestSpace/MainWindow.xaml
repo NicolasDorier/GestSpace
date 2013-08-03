@@ -10,6 +10,15 @@
         xmlns:local="clr-namespace:GestSpace"
         >
     <Grid x:Name="root">
+        <Border DataContext="{Binding Debug}" Background="Black" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Right">
+            <UniformGrid Columns="2">
+                <TextBlock Margin="5">FPS</TextBlock>
+                <TextBlock Text="{Binding FPS}"></TextBlock>
+                <TextBlock Margin="5">Fingers</TextBlock>
+                <TextBlock Text="{Binding FingerCount}"></TextBlock>
+            </UniformGrid>
+        </Border>
+        
         <ListBox x:Name="list" 
                  ItemsSource="{Binding Tiles}" 
                  SelectedItem="{Binding CurrentTile, Mode=TwoWay}">
@@ -27,6 +36,7 @@
                 <Style TargetType="ListBoxItem">
                     <Setter Property="HorizontalAlignment" Value="Left"></Setter>
                     <Setter Property="VerticalAlignment" Value="Top"></Setter>
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"></Setter>
                     <Setter Property="controls:HexCanvas.LeftHex" Value="{Binding Position.X}"></Setter>
                     <Setter Property="controls:HexCanvas.TopHex" Value="{Binding Position.Y}"></Setter>
                     <Setter Property="Template">
@@ -40,5 +50,6 @@
                 </Style>
             </ListBox.ItemContainerStyle> </ListBox>
         <TextBlock x:Name="center" Text="" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+      
     </Grid>
 </Window>

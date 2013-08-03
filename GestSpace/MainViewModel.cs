@@ -3,29 +3,95 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace GestSpace
 {
+	public class DebugViewModel : NotifyPropertyChangedBase
+	{
+		private int _FPS;
+		public int FPS
+		{
+			get
+			{
+				return _FPS;
+			}
+			set
+			{
+				if(value != _FPS)
+				{
+					_FPS = value;
+					OnPropertyChanged(() => this.FPS);
+				}
+			}
+		}
+
+		private int _FingerCount;
+		public int FingerCount
+		{
+			get
+			{
+				return _FingerCount;
+			}
+			set
+			{
+				if(value != _FingerCount)
+				{
+					_FingerCount = value;
+					OnPropertyChanged(() => this.FingerCount);
+				}
+			}
+		}
+	}
 	public class MainViewModel : NotifyPropertyChangedBase
 	{
-		public MainViewModel()
+		public MainViewModel(ReactiveSpace spaceListener)
 		{
-			for(int x = 0 ; x < 4 ; x++)
+			this._SpaceListener = spaceListener;
+			for(int x = 0 ; x < 1 ; x++)
 			{
-				for(int y = 0 ; y < 6 ; y++)
+				for(int y = 0 ; y < 2 ; y++)
 				{
 					_Tiles.Add(new TileViewModel()
 					{
-						Position = new Point(x, y)
+						Position = new Point(x, y),
+						Action = y % 2 == 0 ? (ActionViewModel)new UnusedActionViewModel() : KeyboardActionViewModel.CreateSwitchWindow(),
+						Description = y % 2 == 0 ? "" : "Volume",
 					});
 				}
 			}
 
-			SelectTile(new Point(1, 4));
-			SelectTile(40);
+			_Tiles.Add(new TileViewModel()
+			{
+				Position = new Point(0,1),
+				Action = KeyboardActionViewModel.CreateSwitchWindow(),
+				Description = "Switch windows"
+			});
+			_Tiles.Add(new TileViewModel()
+			{
+				Position = new Point(0, 0),
+				Action = new UnusedActionViewModel(),
+				Description = "New"
+			});
+			_Tiles.Add(new TileViewModel()
+			{
+				Position = new Point(1, 0),
+				Action = new VolumeActionViewModel(),
+				Description = "Volume"
+			});
+			SelectTile(new Point(0, 1));
+		}
+
+		private readonly DebugViewModel _Debug = new DebugViewModel();
+		public DebugViewModel Debug
+		{
+			get
+			{
+				return _Debug;
+			}
 		}
 		private readonly ObservableCollection<TileViewModel> _Tiles = new ObservableCollection<TileViewModel>();
 		public ObservableCollection<TileViewModel> Tiles
@@ -35,6 +101,18 @@ namespace GestSpace
 				return _Tiles;
 			}
 		}
+
+		private readonly ReactiveSpace _SpaceListener;
+		public ReactiveSpace SpaceListener
+		{
+			get
+			{
+				return _SpaceListener;
+			}
+		}
+
+		SerialDisposable _PresenterSubscription = new SerialDisposable();
+
 		private TileViewModel _CurrentTile;
 		public TileViewModel CurrentTile
 		{
@@ -51,6 +129,14 @@ namespace GestSpace
 					_CurrentTile = value;
 					if(_CurrentTile != null)
 						_CurrentTile.IsSelected = true;
+					if(_CurrentTile != null)
+					{
+						_PresenterSubscription.Disposable = _CurrentTile.Action.Presenter.Subscribe(SpaceListener);
+					}
+					else
+					{
+						_PresenterSubscription.Disposable = null;
+					}
 					OnPropertyChanged(() => this.CurrentTile);
 				}
 			}
@@ -85,8 +171,8 @@ namespace GestSpace
 				return;
 
 			bool isPair = CurrentTile.Position.Y % 2 == 0;
-			int anglePart 
-				         = angle < -120 ? -120 :
+			int anglePart
+						 = angle < -120 ? -120 :
 						   angle < -60 ? -60 :
 						   angle < 0 ? 0 :
 						   angle < 60 ? 60 :
@@ -99,7 +185,7 @@ namespace GestSpace
 		private void SelectTile(Point point)
 		{
 			var tile = Tiles.FirstOrDefault(t => t.Position == point);
-			if(tile != null)
+			if(tile != null && !tile.IsUnused)
 				CurrentTile = tile;
 		}
 	}

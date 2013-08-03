@@ -1,6 +1,10 @@
-﻿using System;
+﻿using GestSpace.Controls;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,39 +27,50 @@ namespace GestSpace
 		public TileView()
 		{
 			InitializeComponent();
-			SetBinding(IsSelectedProperty, new Binding("IsSelected"));
+			SetBinding(ViewModelProperty, new Binding());
+
 		}
 
+		SerialDisposable _Subscription = new SerialDisposable();
 
-		bool IsSelected
+		public TileViewModel ViewModel
 		{
 			get
 			{
-				return (bool)GetValue(IsSelectedProperty);
+				return (TileViewModel)GetValue(ViewModelProperty);
 			}
 			set
 			{
-				SetValue(IsSelectedProperty, value);
+				SetValue(ViewModelProperty, value);
 			}
 		}
 
-		// Using a DependencyProperty as the backing store for IsSelected.  This enables animation, styling, binding, etc...
-		static readonly DependencyProperty IsSelectedProperty =
-			DependencyProperty.Register("IsSelected", typeof(bool), typeof(TileView), new PropertyMetadata(false,OnIsSelectedChanged));
+		// Using a DependencyProperty as the backing store for ViewModel.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty ViewModelProperty =
+			DependencyProperty.Register("ViewModel", typeof(TileViewModel), typeof(TileView), new PropertyMetadata(OnViewModelChanged));
 
-		static void OnIsSelectedChanged(DependencyObject source, DependencyPropertyChangedEventArgs args)
+
+		static void OnViewModelChanged(DependencyObject source, DependencyPropertyChangedEventArgs args)
 		{
 			TileView sender = (TileView)source;
 			sender.UpdateStates(true);
+			if(sender.ViewModel == null)
+				sender._Subscription.Disposable = null;
+			else
+				sender._Subscription.Disposable = Observable.FromEventPattern<PropertyChangedEventArgs>(sender.ViewModel, "PropertyChanged")
+						  .Subscribe(o => sender.UpdateStates(true));
 		}
+
+
 
 		private void UpdateStates(bool transition)
 		{
-			if(IsSelected)
-				VisualStateManager.GoToState(this, "SelectedState", transition);
-			else
-				VisualStateManager.GoToState(this, "NotSelectedState", transition);
+			VisualStateManager.GoToState(this, ViewModel.IsUnused ? "Unused" : "Used", transition);
+			VisualStateManager.GoToState(this, ViewModel.IsSelected ? "SelectedState" : "NotSelectedState", transition);
+			VisualStateManager.GoToState(this, ViewModel.IsLocked ? "Locked" : "NotLocked", transition);
 		}
+
+		
 
 
 	}
