@@ -3,37 +3,77 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:controls="clr-namespace:GestSpace.Controls;assembly=GestSpace.Controls"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              >
     <UserControl.Resources>
-        <Style TargetType="TextBox">
+        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="MinWidth" Value="200"></Setter>
             <Setter Property="MaxWidth" Value="200"></Setter>
             <Setter Property="Margin" Value="10,0,0,10"></Setter>
+            <Setter Property="FontSize" Value="13"></Setter>
+            <Setter Property="Foreground" Value="{DynamicResource NormalForegroundBrush}"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
         </Style>
         <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="FontSize" Value="12"></Setter>
-            <Setter Property="VerticalAlignment" Value="Top"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
             <Setter Property="Margin" Value="0,0,0,10"></Setter>
         </Style>
     </UserControl.Resources>
     <Border 
+        x:Name="border"
+        IsHitTestVisible="True"
         Background="{DynamicResource BackgroundBrush}" 
         BorderThickness="3"
         Padding="20"
         BorderBrush="{DynamicResource LightForegroundBrush}" >
-        <controls:AutoArrangeGrid>
-            <controls:AutoArrangeGrid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </controls:AutoArrangeGrid.ColumnDefinitions>
-            <TextBlock Text="Name"></TextBlock>
-            <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-            <TextBlock Text="Gesture"></TextBlock>
-            <TextBox></TextBox>
-            <TextBlock Text="Action"></TextBlock>
-            <TextBox></TextBox>
-        </controls:AutoArrangeGrid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="ShowStates">
+                <VisualState x:Name="Showing"></VisualState>
+                <VisualState x:Name="NotShowing">
+                    <Storyboard>
+                        <DoubleAnimation
+                            Storyboard.TargetName="border"
+                            Storyboard.TargetProperty="Opacity"
+                            To="0.0"
+                            Duration="0"></DoubleAnimation>
+                        <ObjectAnimationUsingKeyFrames
+                            Storyboard.TargetName="border"
+                            Storyboard.TargetProperty="IsHitTestVisible">
+                            <DiscreteObjectKeyFrame KeyTime="0:0:0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <sys:Boolean>False</sys:Boolean>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualStateGroup.Transitions>
+                    <VisualTransition GeneratedDuration="0:0:0.3"></VisualTransition>
+                </VisualStateGroup.Transitions>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid>
+            <TextBlock Text="X"
+                       Cursor="Hand"
+                       MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
+                       VerticalAlignment="Top" 
+                       Margin="0,-20,-15,0" 
+                       HorizontalAlignment="Right"></TextBlock>
+            <controls:AutoArrangeGrid>
+                <controls:AutoArrangeGrid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </controls:AutoArrangeGrid.ColumnDefinitions>
+                <TextBlock Text="Name"></TextBlock>
+                <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                <!--<TextBlock Text="Shor"></TextBlock>
+                <TextBox></TextBox>-->
+                <TextBlock Text="Action"></TextBlock>
+                <TextBox Text="blabla bla"></TextBox>
+            </controls:AutoArrangeGrid>
+        </Grid>
     </Border>
 </UserControl>

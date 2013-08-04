@@ -11,6 +11,22 @@ namespace GestSpace
 {
 	public class TileViewModel : NotifyPropertyChangedBase
 	{
+		private MainViewModel _Main;
+		public MainViewModel Main
+		{
+			get
+			{
+				return _Main;
+			}
+			set
+			{
+				if(value != _Main)
+				{
+					_Main = value;
+					OnPropertyChanged(() => this.Main);
+				}
+			}
+		}
 		private Point _Position;
 		public Point Position
 		{

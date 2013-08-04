@@ -1,15 +1,62 @@
-﻿using System;
+﻿using GestSpace.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Media;
+using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace GestSpace
 {
 	public static class Extensions
 	{
+
+
+		public static bool GetOnAdornerLayer(DependencyObject obj)
+		{
+			return (bool)obj.GetValue(OnAdornerLayerProperty);
+		}
+
+		public static void SetOnAdornerLayer(DependencyObject obj, bool value)
+		{
+			obj.SetValue(OnAdornerLayerProperty, value);
+		}
+
+		// Using a DependencyProperty as the backing store for OnAdornerLayer.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty OnAdornerLayerProperty =
+			DependencyProperty.RegisterAttached("OnAdornerLayer", typeof(bool), typeof(Extensions), new PropertyMetadata(false, OnOnAdornerLayerChanged));
+
+
+		static void OnOnAdornerLayerChanged(DependencyObject source, DependencyPropertyChangedEventArgs args)
+		{
+			Dispatcher.CurrentDispatcher.BeginInvoke(new Action(() =>
+			{
+				var uiElement = (Control)source;
+				var parent = (Panel)VisualTreeHelper.GetParent(source);
+				var layer = AdornerLayer.GetAdornerLayer(parent);
+				if(layer != null)
+				{
+					parent.Children.Remove(uiElement);
+					var adorner = new ControlAdorner(parent);
+					adorner.Child = uiElement;
+					uiElement.SetBinding(Control.DataContextProperty, new Binding("DataContext")
+					{
+						Source = parent
+					});
+					layer.Add(adorner);
+				}
+			}));
+		}
+
+
 		public static IObservable<bool> OnlyTimeout<T>(this IObservable<T> obs, TimeSpan time)
 		{
 			return obs.Select((o) => false).Timeout(time, Observable.Return(true)).Where((o) => o);

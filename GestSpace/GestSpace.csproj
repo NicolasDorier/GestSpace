@@ -41,8 +41,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Externals\CoreAudioApi.dll</HintPath>
     </Reference>
-    <Reference Include="InputSimulator">
-      <HintPath>E:\Downloads\InputSimulator.0.1.0.0-bin\InputSimulator.0.1.0.0-bin\Release\InputSimulator.dll</HintPath>
+    <Reference Include="InputSimulator, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Externals\InputSimulator.dll</HintPath>
     </Reference>
     <Reference Include="LeapCSharp.NET4.0, Version=0.0.0.0, Culture=neutral, PublicKeyToken=6e1b1368e71eba9b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -183,6 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Externals\CoreAudioApi.dll" />
+    <Content Include="Externals\InputSimulator.dll" />
     <Content Include="Externals\NicolasDorier.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

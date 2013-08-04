@@ -128,6 +128,7 @@ namespace GestSpace
 				return;
 			_Maximized = true;
 			WindowState = System.Windows.WindowState.Maximized;
+			Topmost = true;
 			var animation = CreateDoubleAnimation(1.0, new Duration(TimeSpan.FromSeconds(0.5)));
 			this.BeginAnimation(OpacityProperty, animation);
 		}
@@ -216,7 +217,9 @@ namespace GestSpace
 					if(ViewModel.Debug.FingerCount <= 2)
 					{
 						var angle = Helper.RadianToDegree(Math.Atan2(o.Move.y, o.Move.x));
-						ViewModel.SelectTile(angle);
+						var selected = ViewModel.SelectTile(angle);
+						if(selected != null)
+							ViewModel.ShowConfig = false;
 					}
 				});
 

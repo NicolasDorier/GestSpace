@@ -6,17 +6,20 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Markup;
 using System.Windows.Media;
 
 namespace GestSpace.Controls
 {
+	
 	public class ControlAdorner : Adorner
 	{
-		private Control _child;
+		private FrameworkElement _child;
 
 		public ControlAdorner(UIElement adornedElement)
 			: base(adornedElement)
 		{
+			
 		}
 
 		protected override int VisualChildrenCount
@@ -34,7 +37,7 @@ namespace GestSpace.Controls
 			return _child;
 		}
 
-		public Control Child
+		public FrameworkElement Child
 		{
 			get
 			{

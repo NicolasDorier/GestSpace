@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:GestSpace"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d"
+             MouseLeftButtonDown="UserControl_MouseLeftButtonDown"
              >
     <controls:Hex x:Name="hex" 
                   Background="{StaticResource BackgroundBrush}"
@@ -65,6 +66,13 @@
                               Width="180"></controls:Hex>
             </Grid>
             <Grid x:Name="usedGrid">
+                
+                    <local:TileConfigView
+             local:Extensions.OnAdornerLayer="True"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Left"
+            Margin="-300,0,0,0"
+            ></local:TileConfigView>
                 <ContentPresenter Height="75"
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Center"

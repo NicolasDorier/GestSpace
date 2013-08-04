@@ -18,9 +18,7 @@
                 <TextBlock Text="{Binding FingerCount}"></TextBlock>
             </UniformGrid>
         </Border>
-        
-        
-        
+
         <ListBox x:Name="list" 
                  ItemsSource="{Binding Tiles}" 
                  SelectedItem="{Binding CurrentTile, Mode=TwoWay}">
@@ -31,7 +29,9 @@
             </ListBox.ItemsPanel>
             <ListBox.Template>
                 <ControlTemplate>
-                    <ItemsPresenter></ItemsPresenter>
+                    <AdornerDecorator>
+                        <ItemsPresenter></ItemsPresenter>
+                    </AdornerDecorator>
                 </ControlTemplate>
             </ListBox.Template>
             <ListBox.ItemContainerStyle>
@@ -50,15 +50,16 @@
                         </Setter.Value>
                     </Setter>
                 </Style>
-            </ListBox.ItemContainerStyle> </ListBox>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
 
         <!--<local:TileConfigView
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
             Margin="0,0,500,0"
             DataContext="{Binding CurrentTile}"></local:TileConfigView>-->
-        
+
         <TextBlock x:Name="center" Text="" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
-      
+
     </Grid>
 </Window>

@@ -70,6 +70,11 @@ namespace GestSpace
 
 		void UpdateFreeTiles(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if(e.NewItems != null)
+				foreach(var item in e.NewItems)
+				{
+					((TileViewModel)item).Main = this;
+				}
 			UpdateFreeTiles();
 		}
 
@@ -197,13 +202,13 @@ namespace GestSpace
 
 			}.ToDictionary(row => Tuple.Create((int)row[0], (bool)row[1]), row => new Point((int)row[2], (int)row[3]));
 
-		internal void SelectTile(double angle)
+		internal TileViewModel SelectTile(double angle)
 		{
 			Console.WriteLine("Angle : " + (int)angle);
 			if(CurrentTile == null)
 				CurrentTile = Tiles.FirstOrDefault();
 			if(CurrentTile == null)
-				return;
+				return null;
 
 			bool isPair = IsPair(CurrentTile);
 			int anglePart
@@ -213,7 +218,7 @@ namespace GestSpace
 						   angle < 60 ? 60 :
 						   angle < 120 ? 120 : 180;
 			var point = _NeightbourTable[Tuple.Create(anglePart, isPair)];
-			SelectTile(CurrentTile.Position + (Vector)point);
+			return SelectTile(CurrentTile.Position + (Vector)point);
 		}
 
 		private bool IsPair(TileViewModel tile)
@@ -221,11 +226,29 @@ namespace GestSpace
 			return tile.Position.Y % 2 == 0;
 		}
 
-		private void SelectTile(Point point)
+		private TileViewModel SelectTile(Point point)
 		{
 			var tile = Tiles.FirstOrDefault(t => t.Position == point);
 			if(tile != null && !tile.IsUnused)
 				CurrentTile = tile;
+			return tile;
+		}
+
+		private bool _ShowConfig;
+		public bool ShowConfig
+		{
+			get
+			{
+				return _ShowConfig;
+			}
+			set
+			{
+				if(value != _ShowConfig)
+				{
+					_ShowConfig = value;
+					OnPropertyChanged(() => this.ShowConfig);
+				}
+			}
 		}
 	}
 }

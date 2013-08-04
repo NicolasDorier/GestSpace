@@ -70,6 +70,11 @@ namespace GestSpace
 			VisualStateManager.GoToState(this, ViewModel.IsLocked ? "Locked" : "NotLocked", transition);
 		}
 
+		private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			ViewModel.Main.ShowConfig = true;
+		}
+
 		
 
 
