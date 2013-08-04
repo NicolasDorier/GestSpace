@@ -66,8 +66,8 @@
                               Width="180"></controls:Hex>
             </Grid>
             <Grid x:Name="usedGrid">
-                
-                    <local:TileConfigView
+
+                <local:TileConfigView
              local:Extensions.OnAdornerLayer="True"
             VerticalAlignment="Center"
             HorizontalAlignment="Left"

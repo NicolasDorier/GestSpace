@@ -1,0 +1,84 @@
+﻿<UserControl x:Class="GestSpace.ClickPresenterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:controls="clr-namespace:GestSpace.Controls;assembly=GestSpace.Controls"
+             xmlns:local="clr-namespace:GestSpace"
+             mc:Ignorable="d"
+             d:DesignHeight="75" d:DesignWidth="300">
+    <Grid>
+        <Grid.Resources>
+            <PathGeometry x:Key="dash" Figures="M 0 70 L 50 0 L 100 70 L 70 70 L 50 45 L 30 70 Z"></PathGeometry>
+        </Grid.Resources>
+        <!--<Ellipse x:Name="ellipse" 
+                        Stroke="{StaticResource NormalForegroundBrush}"
+                         Height="0"
+                         Width="0"
+                         HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                         StrokeThickness="3">
+        </Ellipse>-->
+        <Viewbox>
+            <Grid Height="100" Width="100">
+                <Path x:Name="DownPart" HorizontalAlignment="Center"
+                      VerticalAlignment="Bottom"
+                      Stretch="Uniform"
+                      Height="20"
+                      Fill="{StaticResource NormalForegroundBrush}"
+                      Data="{StaticResource dash}"
+                      RenderTransformOrigin="0.5,0.5"
+              >
+                    <Path.RenderTransform>
+                        <RotateTransform Angle="180"></RotateTransform>
+                    </Path.RenderTransform>
+                </Path>
+
+                <Path 
+                    x:Name="RightPart" 
+                    HorizontalAlignment="Right"
+                      VerticalAlignment="Center"
+                      Stretch="Uniform"
+                      Height="20"
+                      Fill="{StaticResource NormalForegroundBrush}"
+                      Data="{StaticResource dash}"
+                      RenderTransformOrigin="0.5,0.5"
+              >
+                    <Path.RenderTransform>
+                        <RotateTransform Angle="90"></RotateTransform>
+                    </Path.RenderTransform>
+                </Path>
+                <Ellipse 
+                         x:Name="CentralPart"
+                         Fill="{StaticResource NormalForegroundBrush}"
+                         Height="40"
+                         Width="40"
+                         ></Ellipse>
+                <Path 
+                    x:Name="LeftPart" 
+                    HorizontalAlignment="Left"
+                      VerticalAlignment="Center"
+                      Stretch="Uniform"
+                      Height="20"
+                      Fill="{StaticResource NormalForegroundBrush}"
+                      Data="{StaticResource dash}"
+                      RenderTransformOrigin="0.5,0.5"
+              >
+                    <Path.RenderTransform>
+                        <RotateTransform Angle="270"></RotateTransform>
+                    </Path.RenderTransform>
+                </Path>
+
+                <Path 
+                    x:Name="UpPart" 
+                    HorizontalAlignment="Center"
+                      VerticalAlignment="Top"
+                      Stretch="Uniform"
+                      Height="20"
+                      Fill="{StaticResource NormalForegroundBrush}"
+                      Data="{StaticResource dash}">
+                </Path>
+            </Grid>
+        </Viewbox>
+    </Grid>
+</UserControl>

@@ -64,7 +64,9 @@
         <DataTemplate DataType="{x:Type local:MovePresenterViewModel}">
             <Path Fill="{StaticResource NormalForegroundBrush}" Data="{StaticResource MoveUpDownGeometry}" Stretch="Uniform"></Path>
         </DataTemplate>
-
+        <DataTemplate DataType="{x:Type local:ClickPresenterViewModel}">
+            <local:ClickPresenterView></local:ClickPresenterView>
+        </DataTemplate>
 
 
         <Style x:Key="GeometryBar" TargetType="ProgressBar">

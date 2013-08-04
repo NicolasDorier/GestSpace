@@ -87,8 +87,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ActionTemplateViewModel.cs" />
     <Compile Include="ActionViewModel.cs" />
     <Compile Include="AnonymousComparer.cs" />
+    <Compile Include="ClickPresenterView.xaml.cs">
+      <DependentUpon>ClickPresenterView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ClickPresenterViewModel.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Interop\WinAPI.cs" />
     <Compile Include="KeyboardActionViewModel.cs" />
@@ -102,6 +107,7 @@
     <Compile Include="TileConfigView.xaml.cs">
       <DependentUpon>TileConfigView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TileConfigViewModelMock.cs" />
     <Compile Include="TileView.xaml.cs">
       <DependentUpon>TileView.xaml</DependentUpon>
     </Compile>
@@ -112,6 +118,10 @@
     </Compile>
     <Compile Include="ValuePresenterViewModel.cs" />
     <Compile Include="VolumeActionViewModel.cs" />
+    <Page Include="ClickPresenterView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

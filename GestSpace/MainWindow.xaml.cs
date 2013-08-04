@@ -172,7 +172,10 @@ namespace GestSpace
 				.ObserveOn(SynchronizationContext.Current)
 				.Subscribe(b =>
 				{
-					//Minimize();
+					if(!ViewModel.ShowConfig)
+					{
+						Minimize();
+					}
 				});
 
 

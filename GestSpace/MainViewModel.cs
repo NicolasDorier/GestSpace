@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using WindowsInput;
 
 namespace GestSpace
 {
@@ -53,6 +54,38 @@ namespace GestSpace
 			this._SpaceListener = spaceListener;
 			this._Tiles.CollectionChanged += UpdateFreeTiles;
 
+			_ActionTemplates.Add(new ActionTemplateViewModel("Not used", "", () => new UnusedActionViewModel()));
+			_ActionTemplates.Add(new ActionTemplateViewModel("Switch windows", () => KeyboardActionViewModel.CreateSwitchWindow()));
+			_ActionTemplates.Add(new ActionTemplateViewModel("Volume", () => new VolumeActionViewModel()));
+			_ActionTemplates.Add(new ActionTemplateViewModel("Dock window", () => new ActionViewModel()
+			{
+				Presenter = new ClickPresenterViewModel(
+				onUp: () =>
+				{
+					InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+					InputSimulator.SimulateKeyPress(VirtualKeyCode.UP);
+					InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+				},
+				onDown: () =>
+				{
+					InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+					InputSimulator.SimulateKeyPress(VirtualKeyCode.DOWN);
+					InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+				},
+				onLeft:() =>
+				{
+					InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+					InputSimulator.SimulateKeyPress(VirtualKeyCode.LEFT);
+					InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+				},
+				onRight: () =>
+				{
+					InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+					InputSimulator.SimulateKeyPress(VirtualKeyCode.RIGHT);
+					InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+				})
+			}));
+
 			_Tiles.Add(new TileViewModel()
 			{
 				Position = new Point(0, 1),
@@ -78,8 +111,10 @@ namespace GestSpace
 			UpdateFreeTiles();
 		}
 
+
+
 		bool guard = false;
-		private void UpdateFreeTiles()
+		internal void UpdateFreeTiles()
 		{
 			if(!guard)
 			{
@@ -89,24 +124,54 @@ namespace GestSpace
 				.Select(t => new
 					{
 						Tile = t,
-						Neightbours = _Angles
-										.Select(a => t.Position + (Vector)_NeightbourTable[Tuple.Create(a, IsPair(t))])
+						Neightbours = t.GetNeightbours()
 					})
 				.SelectMany(p => p.Neightbours)
 				.Distinct()
-				.Where(p => Tiles.All(t => t.Position != p))
+				.Where(p => Tiles.All(t => t.Position != p.Position))
 				.Select(p => new TileViewModel()
 				{
-					Position = p,
+					Position = p.Position,
 					Action = new UnusedActionViewModel()
 				}).ToList();
 				foreach(var neightbour in neightbours)
 				{
 					_Tiles.Add(neightbour);
 				}
+
 				RemoveOccupiedUnused();
+
+				var isolatedUnused = _Tiles
+										.Where(t => t.IsUnused)
+										.Select(t => new
+											{
+												Tile = t,
+												Neightbours = NeightbourOfTile(t)
+											})
+										.Where(t => t.Neightbours.All(n => n == null || n.IsUnused))
+										.Select(t => t.Tile);
+
+				foreach(var tile in isolatedUnused.ToList())
+				{
+					if(_Tiles.Count != 1)
+						_Tiles.Remove(tile);
+				}
+
 				guard = false;
 			}
+		}
+
+		public IEnumerable<TileViewModel> NeightbourOfTile(TileViewModel tile)
+		{
+			return
+				tile.GetNeightbours()
+				.Select(n => FindTile(n.Position))
+				.Where(t => t != null);
+		}
+
+		private TileViewModel FindTile(Point point)
+		{
+			return _Tiles.FirstOrDefault(t => t.Position == point);
 		}
 
 		private void RemoveOccupiedUnused()
@@ -126,6 +191,15 @@ namespace GestSpace
 				_Tiles.Remove(unused);
 			}
 
+		}
+
+		private readonly ObservableCollection<ActionTemplateViewModel> _ActionTemplates = new ObservableCollection<ActionTemplateViewModel>();
+		public ObservableCollection<ActionTemplateViewModel> ActionTemplates
+		{
+			get
+			{
+				return _ActionTemplates;
+			}
 		}
 
 		private readonly DebugViewModel _Debug = new DebugViewModel();
@@ -154,7 +228,6 @@ namespace GestSpace
 			}
 		}
 
-		SerialDisposable _PresenterSubscription = new SerialDisposable();
 
 		private TileViewModel _CurrentTile;
 		public TileViewModel CurrentTile
@@ -168,39 +241,12 @@ namespace GestSpace
 				if(value != _CurrentTile)
 				{
 					_CurrentTile = value;
-					if(_CurrentTile != null)
-					{
-						_PresenterSubscription.Disposable = _CurrentTile.Action.Presenter.Subscribe(SpaceListener);
-					}
-					else
-					{
-						_PresenterSubscription.Disposable = null;
-					}
 					OnPropertyChanged(() => this.CurrentTile);
 				}
 			}
 		}
 
-		int[] _Angles = new[] { 120, -60, -120, 180, 0, 60 };
-		Dictionary<Tuple<int, bool>, Point> _NeightbourTable =
-			new object[][]
-			{
-				new object[]{ 120, true, 0, -2 },
-				new object[]{ 120, false, 0, -2 },
-				new object[]{ -60, true, 0, 2 },
-				new object[]{ -60, false, 0, 2 },
 
-				new object[]{ 60, true, 0, -1 },
-				new object[]{ 60, false, 1, -1 },
-				new object[]{ -120, true, -1, 1 },
-				new object[]{ -120, false, 0, 1 },
-
-				new object[]{ 180, true, -1, -1 },
-				new object[]{ 180, false, 0, -1 },
-				new object[]{ 0, true, 0, 1 },
-				new object[]{ 0, false, 1, 1 },
-
-			}.ToDictionary(row => Tuple.Create((int)row[0], (bool)row[1]), row => new Point((int)row[2], (int)row[3]));
 
 		internal TileViewModel SelectTile(double angle)
 		{
@@ -210,21 +256,16 @@ namespace GestSpace
 			if(CurrentTile == null)
 				return null;
 
-			bool isPair = IsPair(CurrentTile);
 			int anglePart
 						 = angle < -120 ? -120 :
 						   angle < -60 ? -60 :
 						   angle < 0 ? 0 :
 						   angle < 60 ? 60 :
 						   angle < 120 ? 120 : 180;
-			var point = _NeightbourTable[Tuple.Create(anglePart, isPair)];
-			return SelectTile(CurrentTile.Position + (Vector)point);
+			var neightbour = CurrentTile.GetNeightbours().First(a => a.Angle == anglePart);
+			return SelectTile(neightbour.Position);
 		}
 
-		private bool IsPair(TileViewModel tile)
-		{
-			return tile.Position.Y % 2 == 0;
-		}
 
 		private TileViewModel SelectTile(Point point)
 		{

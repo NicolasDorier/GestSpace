@@ -3,8 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:controls="clr-namespace:GestSpace.Controls;assembly=GestSpace.Controls"
+             xmlns:local="clr-namespace:GestSpace"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             d:DataContext="{d:DesignInstance Type=local:TileConfigViewModelMock, IsDesignTimeCreatable=True}"
              mc:Ignorable="d" 
              >
     <UserControl.Resources>
@@ -12,6 +14,7 @@
             <Setter Property="MinWidth" Value="200"></Setter>
             <Setter Property="MaxWidth" Value="200"></Setter>
             <Setter Property="Margin" Value="10,0,0,10"></Setter>
+            
             <Setter Property="FontSize" Value="13"></Setter>
             <Setter Property="Foreground" Value="{DynamicResource NormalForegroundBrush}"></Setter>
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
@@ -20,6 +23,25 @@
             <Setter Property="FontSize" Value="12"></Setter>
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
             <Setter Property="Margin" Value="0,0,0,10"></Setter>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Margin" Value="10,0,0,10"></Setter>
+            <!--<Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <ContentPresenter x:Name="ContentSite"
+                            IsHitTestVisible="False"
+                            Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                            Margin="3,3,23,3"
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Left"></ContentPresenter>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>-->
+            
         </Style>
     </UserControl.Resources>
     <Border 
@@ -72,7 +94,29 @@
                 <!--<TextBlock Text="Shor"></TextBlock>
                 <TextBox></TextBox>-->
                 <TextBlock Text="Action"></TextBlock>
-                <TextBox Text="blabla bla"></TextBox>
+                
+                <ComboBox ItemsSource="{Binding Main.ActionTemplates}"
+                          SelectedItem="{Binding SelectedActionTemplate, Mode=TwoWay}" >
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter 
+                                    Height="30"
+                                    MaxHeight="30"
+                                    Content="{Binding Sample.Presenter}"></ContentPresenter>
+                                <TextBlock Grid.Column="1" 
+                                           VerticalAlignment="Center"
+                                           FontSize="13"
+                                           Margin="10,0,0,0"
+                                           Text="{Binding Description}"></TextBlock>
+                            </Grid>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </controls:AutoArrangeGrid>
         </Grid>
     </Border>
