@@ -12,25 +12,24 @@
             <Setter Property="MaxWidth" Value="200"></Setter>
             <Setter Property="Margin" Value="10,0,0,10"></Setter>
         </Style>
-        <Style TargetType="TextBlock">
+        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="FontSize" Value="12"></Setter>
             <Setter Property="VerticalAlignment" Value="Top"></Setter>
-            <Setter Property="Foreground" Value="White"></Setter>
             <Setter Property="Margin" Value="0,0,0,10"></Setter>
         </Style>
     </UserControl.Resources>
     <Border 
-        Background="#CC060606" 
+        Background="{DynamicResource BackgroundBrush}" 
         BorderThickness="3"
         Padding="20"
-        BorderBrush="White" >
+        BorderBrush="{DynamicResource LightForegroundBrush}" >
         <controls:AutoArrangeGrid>
             <controls:AutoArrangeGrid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </controls:AutoArrangeGrid.ColumnDefinitions>
             <TextBlock Text="Name"></TextBlock>
-            <TextBox></TextBox>
+            <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"></TextBox>
             <TextBlock Text="Gesture"></TextBlock>
             <TextBox></TextBox>
             <TextBlock Text="Action"></TextBlock>

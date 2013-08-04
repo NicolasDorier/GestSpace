@@ -140,11 +140,11 @@ namespace GestSpace.Controls
 				if(uIElement != null)
 				{
 					var width = Width + GutterSize;
-					double isOdd = HexCanvas.GetTopHex(uIElement) % 2 == 1 ? 1.0 : 0.0;
+					double isOdd = Math.Abs(HexCanvas.GetTopHex(uIElement)) % 2 == 1 ? 1.0 : 0.0;
 					double x = 0.0;
 					double y = 0.0;
 					double left = HexCanvas.GetLeftHex(uIElement);
-					x = left * width + left * 1 / 2 * width + (width - width * 1.0 / 4.0) * isOdd;
+					x = left * 1.5 * width + 0.75 * width * isOdd;
 
 					double top = HexCanvas.GetTopHex(uIElement);
 					y = top * width * (Math.Sqrt(3) / 4);

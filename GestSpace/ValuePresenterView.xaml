@@ -10,8 +10,8 @@
 
     <ProgressBar Style="{StaticResource GeometryBar}" 
                          local:ProgressBarExtensions.Geometry="{StaticResource VolumeGeometry}"
-                         Background="#FF777777"
-                         Foreground="White"
+                         Background="{DynamicResource BackgroundBrush}"
+                         Foreground="{DynamicResource NormalForegroundBrush}"
                          Minimum="{Binding MinValue}"
                          Maximum="{Binding MaxValue}"
                          Value="{Binding Value}"></ProgressBar>

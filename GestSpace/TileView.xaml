@@ -7,7 +7,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d"
              >
-    <controls:Hex x:Name="hex" Width="200">
+    <controls:Hex x:Name="hex" 
+                  Background="{StaticResource BackgroundBrush}"
+                  BorderBrush="{StaticResource LightForegroundBrush}"
+                  Foreground="{StaticResource NormalForegroundBrush}"
+                  Width="200">
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="SelectionStates">
                 <VisualState x:Name="NotSelectedState"></VisualState>
@@ -15,7 +19,7 @@
                     <Storyboard>
                         <ColorAnimation Storyboard.TargetName="hex"  
                                         Storyboard.TargetProperty="(Control.Background).(SolidColorBrush.Color)"
-                                        To="#FF111111"
+                                        To="{StaticResource AltBackground}"
                                         Duration="0"></ColorAnimation>
                     </Storyboard>
                 </VisualState>
@@ -55,17 +59,12 @@
 
         <Grid>
             <Grid x:Name="lockedGrid" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0">
-                <controls:Hex Background="Transparent" Width="180"></controls:Hex>
+                <controls:Hex Background="Transparent"
+                              BorderBrush="{StaticResource NormalForegroundBrush}"
+                              Foreground="{StaticResource NormalForegroundBrush}"
+                              Width="180"></controls:Hex>
             </Grid>
             <Grid x:Name="usedGrid">
-                <!--<Path HorizontalAlignment="Center" 
-                      Height="75"
-                      Stretch="Uniform"
-                      Data="M 0 70 L 50 0 L 100 70 L 70 70 L 50 45 L 30 70 Z
-                            M 0 100 L 50 30 L 100 100 L 70 100 L 50 75 L 30 100 Z
-                            M 0 150 L 50 220 L 100 150 L 70 150 L 50 175 L 30 150 Z
-                            M 0 180 L 50 250 L 100 180 L 70 180 L 50 205 L 30 180 Z" Fill="White"></Path>-->
-                    
                 <ContentPresenter Height="75"
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Center"
@@ -74,7 +73,7 @@
                 <TextBlock Grid.Row="1" Grid.Column="1"
                            Margin="0,105,0,0"
                                HorizontalAlignment="Center"
-                               FontWeight="ExtraLight"
+                               FontWeight="SemiBold"
                                FontSize="15"
                                VerticalAlignment="Center"
                                Text="{Binding Description}"></TextBlock>

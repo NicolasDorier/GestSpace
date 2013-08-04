@@ -4,12 +4,23 @@
              xmlns:local="clr-namespace:GestSpace"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+       
+
+
+        <Color x:Key="NormalForeground">Gray</Color>
+        <Color x:Key="LightForeground">LightGray</Color>
+        <Color x:Key="Background">White</Color>
+        <Color x:Key="AltBackground">#B5DCFF</Color>
+        <SolidColorBrush x:Key="NormalForegroundBrush" x:Shared="false"  Color="{DynamicResource NormalForeground}"></SolidColorBrush>
+        <SolidColorBrush x:Key="LightForegroundBrush" x:Shared="false" Color="{DynamicResource LightForeground}"></SolidColorBrush>
+        <SolidColorBrush x:Key="BackgroundBrush" x:Shared="false" Color="{DynamicResource Background}"></SolidColorBrush>
+
+
         <Style TargetType="{x:Type TextBlock}">
             <Setter Property="FontSize" Value="13"></Setter>
-            <Setter Property="Foreground" Value="White"></Setter>
+            <Setter Property="Foreground" Value="{DynamicResource NormalForegroundBrush}"></Setter>
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
         </Style>
-
 
         <PathGeometry x:Key="ArrowGeometry" Figures="M 0 50 L 20 50 L 20 0 L 40 0 L 40 50 L 60 50 L 30 100 Z"></PathGeometry>
         <CombinedGeometry x:Key="VolumeGeometry" GeometryCombineMode="Intersect">
@@ -32,13 +43,13 @@
                             M 0 100 L 50 30 L 100 100 L 70 100 L 50 75 L 30 100 Z
                             M 0 150 L 50 220 L 100 150 L 70 150 L 50 175 L 30 150 Z
                             M 0 180 L 50 250 L 100 180 L 70 180 L 50 205 L 30 180 Z"></PathGeometry>
-        
+
         <PathGeometry x:Key="PlusGeometry" Figures="M 20 20 
                                      L 0 20    0 30  20 30
                                      L 20 50  30 50  30 30
                                      L 50 30  50 20  30 20
                                      L 30  0  20  0 Z" ></PathGeometry>
-        
+
 
         <DataTemplate DataType="{x:Type local:TileViewModel}">
             <local:TileView></local:TileView>
@@ -47,11 +58,11 @@
             <local:ValuePresenterView></local:ValuePresenterView>
         </DataTemplate>
         <DataTemplate DataType="{x:Type local:UnusedPresenterViewModel}">
-            <Path Fill="White" Height="25" Data="{StaticResource PlusGeometry}" Stretch="Uniform"></Path>
+            <Path Fill="{StaticResource NormalForegroundBrush}" Height="25" Data="{StaticResource PlusGeometry}" Stretch="Uniform"></Path>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type local:MovePresenterViewModel}">
-            <Path Fill="White" Data="{StaticResource MoveUpDownGeometry}" Stretch="Uniform"></Path>
+            <Path Fill="{StaticResource NormalForegroundBrush}" Data="{StaticResource MoveUpDownGeometry}" Stretch="Uniform"></Path>
         </DataTemplate>
 
 
@@ -102,7 +113,7 @@
                                 </Canvas>
 
                                 <Rectangle x:Name="PART_Track" MaxWidth="{Binding ElementName=track, Path=ActualHeight}" Fill="Transparent"></Rectangle>
-                            
+
                                 <Rectangle  x:Name="PART_Indicator" MaxWidth="{Binding ElementName=track, Path=ActualHeight}"  Fill="Transparent"></Rectangle>
                                 <Rectangle Width="{Binding ElementName=track, Path=ActualHeight}" Fill="Transparent"></Rectangle>
                             </Grid>
