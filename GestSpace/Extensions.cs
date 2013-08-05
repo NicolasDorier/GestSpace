@@ -18,7 +18,10 @@ namespace GestSpace
 {
 	public static class Extensions
 	{
-
+		public static Leap.Vector To2D(this Leap.Vector v)
+		{
+			return new Leap.Vector(v.x, v.y, 0);
+		}
 
 		public static bool GetOnAdornerLayer(DependencyObject obj)
 		{
@@ -30,6 +33,9 @@ namespace GestSpace
 			obj.SetValue(OnAdornerLayerProperty, value);
 		}
 
+
+
+	
 		// Using a DependencyProperty as the backing store for OnAdornerLayer.  This enables animation, styling, binding, etc...
 		public static readonly DependencyProperty OnAdornerLayerProperty =
 			DependencyProperty.RegisterAttached("OnAdornerLayer", typeof(bool), typeof(Extensions), new PropertyMetadata(false, OnOnAdornerLayerChanged));

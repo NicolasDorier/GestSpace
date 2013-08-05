@@ -59,31 +59,96 @@ namespace GestSpace
 			_ActionTemplates.Add(new ActionTemplateViewModel("Volume", () => new VolumeActionViewModel()));
 			_ActionTemplates.Add(new ActionTemplateViewModel("Dock window", () => new ActionViewModel()
 			{
-				Presenter = new ClickPresenterViewModel(
-				onUp: () =>
+				Presenter = new ZonePresenterViewModel()
 				{
-					InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-					InputSimulator.SimulateKeyPress(VirtualKeyCode.UP);
-					InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-				},
-				onDown: () =>
-				{
-					InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-					InputSimulator.SimulateKeyPress(VirtualKeyCode.DOWN);
-					InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-				},
-				onLeft:() =>
-				{
-					InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-					InputSimulator.SimulateKeyPress(VirtualKeyCode.LEFT);
-					InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-				},
-				onRight: () =>
-				{
-					InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-					InputSimulator.SimulateKeyPress(VirtualKeyCode.RIGHT);
-					InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-				})
+					Up = new ZoneTransitionViewModel()
+					{
+						OnEnter = () =>
+						{
+							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+							InputSimulator.SimulateKeyPress(VirtualKeyCode.UP);
+							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+						},
+						OnLeave = () =>
+						{
+							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+							InputSimulator.SimulateKeyPress(VirtualKeyCode.DOWN);
+							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+						}
+					},
+					Down = new ZoneTransitionViewModel()
+					{
+						OnEnter = () =>
+						{
+							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+							InputSimulator.SimulateKeyPress(VirtualKeyCode.DOWN);
+							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+						},
+						OnLeave = () =>
+						{
+							InputSimulator.SimulateKeyDown(VirtualKeyCode.MENU);
+							InputSimulator.SimulateKeyDown(VirtualKeyCode.SHIFT);
+							InputSimulator.SimulateKeyPress(VirtualKeyCode.TAB);
+							InputSimulator.SimulateKeyUp(VirtualKeyCode.MENU);
+							InputSimulator.SimulateKeyUp(VirtualKeyCode.SHIFT);
+						}
+					},
+					Right = new ZoneTransitionViewModel()
+					{
+						OnEnter = () =>
+						{
+							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+							InputSimulator.SimulateKeyPress(VirtualKeyCode.RIGHT);
+							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+						},
+						OnLeave = () =>
+						{
+							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+							InputSimulator.SimulateKeyPress(VirtualKeyCode.LEFT);
+							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+						}
+					},
+					Left = new ZoneTransitionViewModel()
+					{
+						OnEnter = () =>
+						{
+							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+							InputSimulator.SimulateKeyPress(VirtualKeyCode.LEFT);
+							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+						},
+						OnLeave = () =>
+						{
+							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+							InputSimulator.SimulateKeyPress(VirtualKeyCode.RIGHT);
+							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+						}
+					},
+					Center = new ZoneTransitionViewModel()
+					//onUp: () =>
+					//{
+					//	InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+					//	InputSimulator.SimulateKeyPress(VirtualKeyCode.UP);
+					//	InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+					//},
+					//onDown: () =>
+					//{
+					//	InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+					//	InputSimulator.SimulateKeyPress(VirtualKeyCode.DOWN);
+					//	InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+					//},
+					//onLeft:() =>
+					//{
+					//	InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+					//	InputSimulator.SimulateKeyPress(VirtualKeyCode.LEFT);
+					//	InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+					//},
+					//onRight: () =>
+					//{
+					//	InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
+					//	InputSimulator.SimulateKeyPress(VirtualKeyCode.RIGHT);
+					//	InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
+					//}
+				}
 			}));
 
 			_Tiles.Add(new TileViewModel()
@@ -291,5 +356,7 @@ namespace GestSpace
 				}
 			}
 		}
+
+		
 	}
 }

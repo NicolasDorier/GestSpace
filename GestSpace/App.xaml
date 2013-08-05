@@ -54,6 +54,7 @@
         <DataTemplate DataType="{x:Type local:TileViewModel}">
             <local:TileView></local:TileView>
         </DataTemplate>
+        
         <DataTemplate DataType="{x:Type local:ValuePresenterViewModel}">
             <local:ValuePresenterView></local:ValuePresenterView>
         </DataTemplate>
@@ -64,8 +65,13 @@
         <DataTemplate DataType="{x:Type local:MovePresenterViewModel}">
             <Path Fill="{StaticResource NormalForegroundBrush}" Data="{StaticResource MoveUpDownGeometry}" Stretch="Uniform"></Path>
         </DataTemplate>
+        
         <DataTemplate DataType="{x:Type local:ClickPresenterViewModel}">
             <local:ClickPresenterView></local:ClickPresenterView>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type local:ZonePresenterViewModel}">
+            <local:ZonePresenterView></local:ZonePresenterView>
         </DataTemplate>
 
 

@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="GestSpace.ZonePresenterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:controls="clr-namespace:GestSpace.Controls;assembly=GestSpace.Controls"
+             xmlns:local="clr-namespace:GestSpace"
+             mc:Ignorable="d" 
+             d:DesignHeight="75" d:DesignWidth="300">
+    <Grid>
+        <Grid.Resources>
+            <PathGeometry x:Key="dash" Figures="M 0 70 L 50 0 L 100 70 L 70 70 L 50 45 L 30 70 Z"></PathGeometry>
+            <Style x:Key="RectangleStyle" x:Shared="false"  TargetType="local:ZoneView">
+                <Setter Property="Width" Value="31"></Setter>
+                <Setter Property="Height" Value="31"></Setter>
+            </Style>
+        </Grid.Resources>
+        <Viewbox>
+            <Grid Height="100" Width="100">
+                <local:ZoneView 
+                    x:Name="CenterPart"
+                    DataContext="{Binding Center}"
+                    Style="{StaticResource RectangleStyle}"
+                    ></local:ZoneView>
+
+                <local:ZoneView 
+                    x:Name="RightPart"
+                    DataContext="{Binding Right}"
+                    HorizontalAlignment="Right"
+                    Style="{StaticResource RectangleStyle}"
+                    ></local:ZoneView>
+
+                <local:ZoneView 
+                    x:Name="LeftPart"
+                    DataContext="{Binding Left}"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource RectangleStyle}"
+                    ></local:ZoneView>
+
+                <local:ZoneView 
+                    x:Name="TopPart"
+                    DataContext="{Binding Up}"
+                    VerticalAlignment="Top"
+                    Style="{StaticResource RectangleStyle}"
+                    ></local:ZoneView>
+
+                <local:ZoneView 
+                    x:Name="DownPart"
+                    DataContext="{Binding Down}"
+                    VerticalAlignment="Bottom"
+                    Style="{StaticResource RectangleStyle}"
+                    ></local:ZoneView>
+
+                
+            </Grid>
+        </Viewbox>
+    </Grid>
+</UserControl>

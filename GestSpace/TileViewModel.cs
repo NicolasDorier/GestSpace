@@ -164,7 +164,7 @@ namespace GestSpace
 			}
 		}
 
-		private void AttachPresenterIfNeeded()
+		internal void AttachPresenterIfNeeded()
 		{
 			if(!_IsSelected)
 				_PresenterSubscription.Disposable = null;
@@ -233,6 +233,11 @@ namespace GestSpace
 					OnPropertyChanged(() => this.IsLocked);
 				}
 			}
+		}
+
+		internal void DetachPresenter()
+		{
+			_PresenterSubscription.Disposable = null;
 		}
 	}
 }

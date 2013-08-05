@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestSpace", "GestSpace\Gest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestSpace.Controls", "GestSpace.Controls\GestSpace.Controls.csproj", "{9871A30A-1B4D-4991-93B3-2EA8EA12E8C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestSpace.Tests", "GestSpace.Tests\GestSpace.Tests.csproj", "{BF492703-1A91-4D9F-91C5-40162F977242}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{9871A30A-1B4D-4991-93B3-2EA8EA12E8C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9871A30A-1B4D-4991-93B3-2EA8EA12E8C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9871A30A-1B4D-4991-93B3-2EA8EA12E8C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF492703-1A91-4D9F-91C5-40162F977242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF492703-1A91-4D9F-91C5-40162F977242}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF492703-1A91-4D9F-91C5-40162F977242}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF492703-1A91-4D9F-91C5-40162F977242}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

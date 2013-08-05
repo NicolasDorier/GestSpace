@@ -119,6 +119,8 @@ namespace GestSpace
 			if(!_Maximized)
 				return;
 			_Maximized = false;
+			if(ViewModel.CurrentTile != null)
+				ViewModel.CurrentTile.DetachPresenter();
 			var animation = CreateDoubleAnimation(0.0, new Duration(TimeSpan.FromSeconds(0.5)));
 			this.BeginAnimation(OpacityProperty, animation);
 		}
@@ -129,10 +131,12 @@ namespace GestSpace
 			_Maximized = true;
 			WindowState = System.Windows.WindowState.Maximized;
 			Topmost = true;
+			if(ViewModel.CurrentTile != null)
+				ViewModel.CurrentTile.AttachPresenterIfNeeded();
 			var animation = CreateDoubleAnimation(1.0, new Duration(TimeSpan.FromSeconds(0.5)));
 			this.BeginAnimation(OpacityProperty, animation);
 		}
-	
+
 		ReactiveListener listener;
 		void MainWindow_Loaded(object sender, RoutedEventArgs e)
 		{
@@ -185,10 +189,11 @@ namespace GestSpace
 				.ObserveOn(ui)
 				.Subscribe(locked =>
 				{
-					ViewModel.CurrentTile.IsLocked = locked;
+					if(ViewModel.CurrentTile != null)
+						ViewModel.CurrentTile.IsLocked = locked;
 				});
 
-			
+
 
 			var centers =
 				listener
@@ -202,6 +207,7 @@ namespace GestSpace
 			//new System.Windows.Vector(v.Average(m => m.Direction.x), v.Average(m => m.Direction.y))
 			listener
 				.FingersMoves
+				.Where((o)=>_Maximized)
 				.SelectMany(f => f)
 				.Select(v => v.TipPosition)
 				.CombineLatest(centers, ViewModel.SpaceListener.IsLocked, (p, center, locked) => new
@@ -213,7 +219,7 @@ namespace GestSpace
 				})
 				.Where(o => o.Move.Magnitude >= 50.0)
 				.Sample(TimeSpan.FromMilliseconds(500))
-				.Where(p=>!p.Locked)
+				.Where(p => !p.Locked)
 				.ObserveOn(ui)
 				.Subscribe(o =>
 				{
@@ -244,7 +250,7 @@ namespace GestSpace
 
 			var gesturesById = listener
 			.Gestures
-			.Where((o) => !false)
+			.Where((o) => !_Maximized)
 				.Where(g => g.Key.Type == Gesture.GestureType.TYPECIRCLE)
 				.SelectMany(g => g.ToList().Select(l => new
 													{
@@ -252,16 +258,17 @@ namespace GestSpace
 														Values = l
 													}))
 				//.SkipUntil(Observable.Interval(TimeSpan.FromMilliseconds(600)))
-				.Buffer(() => listener.Gestures.OnlyTimeout(TimeSpan.FromMilliseconds(700)))
+				.Buffer(() => listener.Gestures.SelectMany(g => g).OnlyTimeout(TimeSpan.FromMilliseconds(500)))
 				.Where(b => b.Count > 0)
 				.Take(1)
 			.Repeat()
 			.ObserveOn(SynchronizationContext.Current)
 			.Subscribe(l =>
 			{
-
 				var distinct = l.SelectMany(oo => oo.Values.SelectMany(o => o.Pointables)).Select(p => p.Id).Distinct().Count();
-				Console.WriteLine("Gesture " + distinct);
+				
+
+
 				Maximize();
 			});
 

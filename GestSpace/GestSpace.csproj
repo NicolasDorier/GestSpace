@@ -96,6 +96,7 @@
     <Compile Include="ClickPresenterViewModel.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Interop\WinAPI.cs" />
+    <Compile Include="Interpreter.cs" />
     <Compile Include="KeyboardActionViewModel.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="MovePresenterViewModel.cs" />
@@ -118,6 +119,13 @@
     </Compile>
     <Compile Include="ValuePresenterViewModel.cs" />
     <Compile Include="VolumeActionViewModel.cs" />
+    <Compile Include="ZonePresenterView.xaml.cs">
+      <DependentUpon>ZonePresenterView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ZonePresenterViewModel.cs" />
+    <Compile Include="ZoneView.xaml.cs">
+      <DependentUpon>ZoneView.xaml</DependentUpon>
+    </Compile>
     <Page Include="ClickPresenterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -144,6 +152,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ValuePresenterView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ZonePresenterView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ZoneView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
