@@ -1,10 +1,13 @@
-﻿using NicolasDorier.UI;
+﻿using Leap;
+using NicolasDorier.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using WindowsInput;
@@ -31,6 +34,41 @@ namespace GestSpace
 		}
 
 		private int _FingerCount;
+		private MainViewModel main;
+
+		public DebugViewModel(MainViewModel mainViewModel)
+		{
+			this.main = mainViewModel;
+			Subscribe(main.SpaceListener);
+		}
+
+		CompositeDisposable _Subscriptions = new CompositeDisposable();
+		private void Subscribe(ReactiveSpace reactiveSpace)
+		{
+			var fps = reactiveSpace.ReactiveListener.Frames
+					.Timestamp()
+					.Buffer(2)
+					.ObserveOn(main.UI)
+					.Subscribe(o =>
+					{
+						var seconds = (o[1].Timestamp - o[0].Timestamp).TotalSeconds;
+						FPS = (int)(1.0 / seconds);
+					});
+
+			var fingerCount = reactiveSpace.ReactiveListener.FingersMoves
+					.ObserveOn(main.UI)
+					.Do(o => FingerCount++)
+					.Select(f => f.ObserveOn(main.UI).Subscribe(o =>
+					{
+
+					}, () =>
+					{
+						FingerCount--;
+					})).Subscribe();
+
+			_Subscriptions.Add(fingerCount);
+			_Subscriptions.Add(fps);
+		}
 		public int FingerCount
 		{
 			get
@@ -47,12 +85,24 @@ namespace GestSpace
 			}
 		}
 	}
+
+	public enum MainViewState
+	{
+		Locked,
+		Minimized,
+		Navigating
+	}
 	public class MainViewModel : NotifyPropertyChangedBase
 	{
+
 		public MainViewModel(ReactiveSpace spaceListener)
 		{
+
+			this.State = MainViewState.Navigating;
 			this._SpaceListener = spaceListener;
 			this._Tiles.CollectionChanged += UpdateFreeTiles;
+			Subscribe(spaceListener);
+
 
 			_ActionTemplates.Add(new ActionTemplateViewModel("Not used", "", () => new UnusedActionViewModel()));
 			_ActionTemplates.Add(new ActionTemplateViewModel("Switch windows", () => KeyboardActionViewModel.CreateSwitchWindow()));
@@ -84,14 +134,14 @@ namespace GestSpace
 							InputSimulator.SimulateKeyPress(VirtualKeyCode.DOWN);
 							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
 						},
-						OnLeave = () =>
-						{
-							InputSimulator.SimulateKeyDown(VirtualKeyCode.MENU);
-							InputSimulator.SimulateKeyDown(VirtualKeyCode.SHIFT);
-							InputSimulator.SimulateKeyPress(VirtualKeyCode.TAB);
-							InputSimulator.SimulateKeyUp(VirtualKeyCode.MENU);
-							InputSimulator.SimulateKeyUp(VirtualKeyCode.SHIFT);
-						}
+						//OnLeave = () =>
+						//{
+						//	InputSimulator.SimulateKeyDown(VirtualKeyCode.MENU);
+						//	InputSimulator.SimulateKeyDown(VirtualKeyCode.SHIFT);
+						//	InputSimulator.SimulateKeyPress(VirtualKeyCode.TAB);
+						//	InputSimulator.SimulateKeyUp(VirtualKeyCode.MENU);
+						//	InputSimulator.SimulateKeyUp(VirtualKeyCode.SHIFT);
+						//}
 					},
 					Right = new ZoneTransitionViewModel()
 					{
@@ -151,20 +201,103 @@ namespace GestSpace
 				}
 			}));
 
-			_Tiles.Add(new TileViewModel()
+			//_Tiles.Add(new TileViewModel()
+			//{
+			//	Position = new Point(0, 1),
+			//	Action = KeyboardActionViewModel.CreateSwitchWindow(),
+			//	Description = "Switch windows"
+			//});
+			//_Tiles.Add(new TileViewModel()
+			//{
+			//	Position = new Point(1, 0),
+			//	Action = new VolumeActionViewModel(),
+			//	Description = "Volume"
+			//});
+
+
+			//SelectTile(new Point(0, 1));
+			this._Debug = new DebugViewModel(this);
+
+			this.Tiles.Add(new TileViewModel()
 			{
-				Position = new Point(0, 1),
-				Action = KeyboardActionViewModel.CreateSwitchWindow(),
-				Description = "Switch windows"
+				Action = new UnusedActionViewModel()
 			});
-			_Tiles.Add(new TileViewModel()
-			{
-				Position = new Point(1, 0),
-				Action = new VolumeActionViewModel(),
-				Description = "Volume"
-			});
-			SelectTile(new Point(0, 1));
+
 		}
+
+		public readonly SynchronizationContext UI = SynchronizationContext.Current;
+
+		CompositeDisposable _Subscriptions = new CompositeDisposable();
+		private void Subscribe(ReactiveSpace spaceListener)
+		{
+			var minimized =
+				spaceListener
+				.ReactiveListener
+				.FingersMoves
+				.SelectMany(m => m)
+				.Select((m) => false)
+				.OnlyTimeout(TimeSpan.FromSeconds(1))
+				.Repeat()
+				.ObserveOn(UI)
+				.Subscribe(b =>
+				{
+					if(!ShowConfig)
+					{
+						State = MainViewState.Minimized;
+					}
+				});
+
+			//var maximize =
+			//				spaceListener
+			//				.ReactiveListener
+			//				.Gestures
+			//				.Where(g => g.Key.Type == Gesture.GestureType.TYPECIRCLE)
+			//				.SelectMany(g => g.ToList().Select(l => new
+			//													{
+			//														Key = g.Key,
+			//														Values = l
+			//													}))
+			//				.Buffer(() => spaceListener.ReactiveListener.Gestures.SelectMany(g => g).OnlyTimeout(TimeSpan.FromMilliseconds(500)))
+			//				.Where(b => b.Count > 0)
+			//				.Take(1)
+			//				.Repeat()
+			//				.ObserveOn(UI)
+			//				.Subscribe(l =>
+			//				{
+			//					var distinct = l.SelectMany(oo => oo.Values.SelectMany(o => o.Pointables)).Select(p => p.Id).Distinct().Count();
+			//					State = MainViewState.Navigating;
+			//				});
+
+			var maximize =
+						spaceListener
+						.LockedHands
+						.SelectMany(h => h)
+						.ObserveOn(UI)
+						.Subscribe(h =>
+						{
+							if(State == MainViewState.Minimized)
+								State = MainViewState.Navigating;
+						});
+
+			var lockedSubs =
+				spaceListener
+				.IsLocked
+				.ObserveOn(UI)
+				.CombineLatest(Helper.PropertyChanged(this, () => this.State), (l, s) => new
+				{
+					Locked = l,
+					State = s
+				})
+				.Where(o => o.State != MainViewState.Minimized)
+				.Subscribe(o =>
+				{
+					State = o.Locked ? MainViewState.Locked : MainViewState.Navigating;
+				});
+			_Subscriptions.Add(lockedSubs);
+			_Subscriptions.Add(maximize);
+			_Subscriptions.Add(minimized);
+		}
+
 
 		void UpdateFreeTiles(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
@@ -267,7 +400,7 @@ namespace GestSpace
 			}
 		}
 
-		private readonly DebugViewModel _Debug = new DebugViewModel();
+		private readonly DebugViewModel _Debug;
 		public DebugViewModel Debug
 		{
 			get
@@ -357,6 +490,25 @@ namespace GestSpace
 			}
 		}
 
-		
+
+		private MainViewState _State;
+		public MainViewState State
+		{
+			get
+			{
+				return _State;
+			}
+			set
+			{
+				if(value != _State)
+				{
+					_State = value;
+					Console.WriteLine("New state : " + value);
+					if(CurrentTile != null)
+						CurrentTile.IsLockedChanged();
+					OnPropertyChanged(() => this.State);
+				}
+			}
+		}
 	}
 }

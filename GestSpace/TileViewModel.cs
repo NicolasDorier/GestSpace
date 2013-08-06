@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -123,7 +125,8 @@ namespace GestSpace
 				if(value != _IsSelected)
 				{
 					_IsSelected = value;
-					AttachPresenterIfNeeded();
+					UpdateListener();
+					OnPropertyChanged(() => this.IsLocked);
 					OnPropertyChanged(() => this.IsSelected);
 				}
 			}
@@ -153,7 +156,8 @@ namespace GestSpace
 
 		public IEnumerable<TileNeighbour> GetNeightbours()
 		{
-			bool isPair = Position.Y % 2 == 0;;
+			bool isPair = Position.Y % 2 == 0;
+			;
 			foreach(var a in _Angles)
 			{
 				yield return new TileNeighbour()
@@ -163,13 +167,26 @@ namespace GestSpace
 				};
 			}
 		}
+		MultipleAssignmentDisposable _TileListener = new MultipleAssignmentDisposable();
+		SynchronizationContext UI = SynchronizationContext.Current;
 
-		internal void AttachPresenterIfNeeded()
+		internal void UpdateListener()
 		{
-			if(!_IsSelected)
+			if(!_IsSelected || Main.State == MainViewState.Minimized)
+			{
+				_TileListener.Disposable = null;
 				_PresenterSubscription.Disposable = null;
+			}
 			else
+			{
+				_TileListener.Disposable = Subscribe(Main.SpaceListener);
 				_PresenterSubscription.Disposable = Action.Presenter.Subscribe(Main.SpaceListener);
+			}
+		}
+
+		private IDisposable Subscribe(ReactiveSpace reactiveSpace)
+		{
+			return null;
 		}
 
 		private ActionViewModel _Action = new ActionViewModel();
@@ -184,7 +201,7 @@ namespace GestSpace
 				if(value != _Action)
 				{
 					_Action = value;
-					AttachPresenterIfNeeded();
+					UpdateListener();
 					OnPropertyChanged(() => this.Action);
 					OnPropertyChanged(() => this.IsUnused);
 				}
@@ -218,26 +235,18 @@ namespace GestSpace
 			}
 		}
 
-		private bool _IsLocked;
 		public bool IsLocked
 		{
 			get
 			{
-				return _IsLocked;
-			}
-			set
-			{
-				if(value != _IsLocked)
-				{
-					_IsLocked = value;
-					OnPropertyChanged(() => this.IsLocked);
-				}
+				Console.WriteLine(Main.State);
+				return Main.State == MainViewState.Locked && _IsSelected;
 			}
 		}
 
-		internal void DetachPresenter()
+		internal void IsLockedChanged()
 		{
-			_PresenterSubscription.Disposable = null;
+			OnPropertyChanged(() => IsLocked);
 		}
 	}
 }

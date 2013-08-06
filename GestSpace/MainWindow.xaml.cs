@@ -50,6 +50,11 @@ namespace GestSpace
 				Source = this,
 				Path = new PropertyPath("ViewModel.CurrentTile")
 			});
+			SetBinding(MainStateProperty, new Binding()
+			{
+				Source = this,
+				Path = new PropertyPath("ViewModel.State")
+			});
 			this.Loaded += MainWindow_Loaded;
 			this.Closed += MainWindow_Closed;
 		}
@@ -113,6 +118,36 @@ namespace GestSpace
 			DependencyProperty.Register("ViewModel", typeof(MainViewModel), typeof(MainWindow), new PropertyMetadata(null));
 
 
+
+
+		public MainViewState MainState
+		{
+			get
+			{
+				return (MainViewState)GetValue(MainStateProperty);
+			}
+			set
+			{
+				SetValue(MainStateProperty, value);
+			}
+		}
+
+		// Using a DependencyProperty as the backing store for MainState.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty MainStateProperty =
+			DependencyProperty.Register("MainState", typeof(MainViewState), typeof(MainWindow), new PropertyMetadata(MainViewState.Minimized, OnMainStateChanged));
+
+		static void OnMainStateChanged(DependencyObject source, DependencyPropertyChangedEventArgs args)
+		{
+			MainWindow sender = (MainWindow)source;
+			var oldState = (MainViewState)args.OldValue;
+			var newState = (MainViewState)args.NewValue;
+			if(oldState == MainViewState.Minimized)
+				sender.Maximize();
+			if(newState == MainViewState.Minimized)
+				sender.Minimize();
+		}
+
+
 		volatile bool _Maximized;
 		private void Minimize()
 		{
@@ -120,7 +155,7 @@ namespace GestSpace
 				return;
 			_Maximized = false;
 			if(ViewModel.CurrentTile != null)
-				ViewModel.CurrentTile.DetachPresenter();
+				ViewModel.CurrentTile.UpdateListener();
 			var animation = CreateDoubleAnimation(0.0, new Duration(TimeSpan.FromSeconds(0.5)));
 			this.BeginAnimation(OpacityProperty, animation);
 		}
@@ -132,69 +167,17 @@ namespace GestSpace
 			WindowState = System.Windows.WindowState.Maximized;
 			Topmost = true;
 			if(ViewModel.CurrentTile != null)
-				ViewModel.CurrentTile.AttachPresenterIfNeeded();
+				ViewModel.CurrentTile.UpdateListener();
 			var animation = CreateDoubleAnimation(1.0, new Duration(TimeSpan.FromSeconds(0.5)));
 			this.BeginAnimation(OpacityProperty, animation);
 		}
 
 		ReactiveListener listener;
 		void MainWindow_Loaded(object sender, RoutedEventArgs e)
-		{
-			//var a = GestSpace.Interop.user32.CountVisibleWindows();
-			//InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-			//InputSimulator.SimulateKeyDown(VirtualKeyCode.TAB);
-
+		{	
 			var ui = SynchronizationContext.Current;
 
-			listener.Frames
-					.Timestamp()
-					.Buffer(2)
-					.ObserveOn(ui)
-					.Subscribe(o =>
-					{
-						var seconds = (o[1].Timestamp - o[0].Timestamp).TotalSeconds;
-						ViewModel.Debug.FPS = (int)(1.0 / seconds);
-					});
-
-			listener.FingersMoves
-					.ObserveOn(ui)
-					.Do(o => ViewModel.Debug.FingerCount++)
-					.Select(f => f.ObserveOn(ui).Subscribe(o =>
-					{
-
-					}, () =>
-					{
-						ViewModel.Debug.FingerCount--;
-					})).Subscribe();
-
-			listener
-				.FingersMoves
-				.SelectMany(m => m)
-				.Select((m) => false)
-				.OnlyTimeout(TimeSpan.FromSeconds(3))
-				.Repeat()
-				.ObserveOn(SynchronizationContext.Current)
-				.Subscribe(b =>
-				{
-					if(!ViewModel.ShowConfig)
-					{
-						Minimize();
-					}
-				});
-
-
-
-			ViewModel.SpaceListener
-				.IsLocked
-				.ObserveOn(ui)
-				.Subscribe(locked =>
-				{
-					if(ViewModel.CurrentTile != null)
-						ViewModel.CurrentTile.IsLocked = locked;
-				});
-
-
-
+			
 			var centers =
 				listener
 				.FingersMoves
@@ -204,17 +187,15 @@ namespace GestSpace
 				.Select(v => new Leap.Vector(v.Average(m => m.TipPosition.x), v.Average(m => m.TipPosition.y), 0.0f));
 
 
-			//new System.Windows.Vector(v.Average(m => m.Direction.x), v.Average(m => m.Direction.y))
 			listener
 				.FingersMoves
-				.Where((o)=>_Maximized)
 				.SelectMany(f => f)
 				.Select(v => v.TipPosition)
 				.CombineLatest(centers, ViewModel.SpaceListener.IsLocked, (p, center, locked) => new
 				{
 					Center = center,
-					Position = To2d(p),
-					Move = To2d(p) - center,
+					Position = p.To2D(),
+					Move = p.To2D() - center,
 					Locked = locked
 				})
 				.Where(o => o.Move.Magnitude >= 50.0)
@@ -223,8 +204,9 @@ namespace GestSpace
 				.ObserveOn(ui)
 				.Subscribe(o =>
 				{
-					if(ViewModel.Debug.FingerCount <= 2)
+					if(ViewModel.Debug.FingerCount <= 2 && ViewModel.State == MainViewState.Navigating)
 					{
+						Console.WriteLine("Center : " + ToString(o.Center) + " Move " + ToString(o.Position));
 						var angle = Helper.RadianToDegree(Math.Atan2(o.Move.y, o.Move.x));
 						var selected = ViewModel.SelectTile(angle);
 						if(selected != null)
@@ -232,57 +214,17 @@ namespace GestSpace
 					}
 				});
 
-			//.Where((i) => _Maximized)
-			//	.SelectMany(f => f)
-			//	.SkipUntil(Observable.Interval(TimeSpan.FromMilliseconds(600)))
-			//		.Buffer(20)
-			//		.Select(v => new System.Windows.Vector(v.Average(m => m.Direction.x), v.Average(m => m.Direction.y)))
-			//		.Where(v => v.Length > 0.4)
-			//		.Take(1)
-			//.Repeat()
-			//.ObserveOn(SynchronizationContext.Current)
-			//.Subscribe(vector =>
-			//{
-			//	var angle = RadianToDegree(Math.Atan2(vector.Y, vector.X));
-			//	ViewModel.SelectTile(angle);
-
-			//});
-
-			var gesturesById = listener
-			.Gestures
-			.Where((o) => !_Maximized)
-				.Where(g => g.Key.Type == Gesture.GestureType.TYPECIRCLE)
-				.SelectMany(g => g.ToList().Select(l => new
-													{
-														Key = g.Key,
-														Values = l
-													}))
-				//.SkipUntil(Observable.Interval(TimeSpan.FromMilliseconds(600)))
-				.Buffer(() => listener.Gestures.SelectMany(g => g).OnlyTimeout(TimeSpan.FromMilliseconds(500)))
-				.Where(b => b.Count > 0)
-				.Take(1)
-			.Repeat()
-			.ObserveOn(SynchronizationContext.Current)
-			.Subscribe(l =>
-			{
-				var distinct = l.SelectMany(oo => oo.Values.SelectMany(o => o.Pointables)).Select(p => p.Id).Distinct().Count();
-				
-
-
-				Maximize();
-			});
+		
 
 
 			Maximize();
 			Center();
 		}
 
-		Leap.Vector To2d(Leap.Vector vector)
+		private string ToString(Leap.Vector vector)
 		{
-			Leap.Vector v = new Leap.Vector(vector.x, vector.y, 0);
-			return v;
+			return (int)vector.x + "," + (int)vector.y;
 		}
-
 
 		void MainWindow_Closed(object sender, EventArgs e)
 		{
@@ -330,7 +272,7 @@ namespace GestSpace
 		{
 			if(e.Key == Key.Escape)
 			{
-				Minimize();
+				ViewModel.State = MainViewState.Minimized;
 				e.Handled = true;
 			}
 		}

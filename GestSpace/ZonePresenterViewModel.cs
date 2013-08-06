@@ -152,7 +152,7 @@ namespace GestSpace
 					if(_Current != null)
 					{
 						_Current.Activated = true;
-						if(_Current.OnLeave != null)
+						if(_Current.OnEnter != null)
 							_Current.OnEnter();
 					}
 					OnPropertyChanged(() => this.Current);

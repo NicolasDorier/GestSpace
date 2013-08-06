@@ -32,14 +32,17 @@ namespace GestSpace
 			{
 				if(_IsLocked == null)
 				{
-					_IsLocked = listener
+					var replay = listener
 								.Frames
 								.SelectMany(f => f.Hands)
 								.Where(h => h.Fingers.Count >= 4)
 								.Select(s => true)
 								.Timeout(TimeSpan.FromMilliseconds(200), Observable.Return(false).Take(1))
 								.Repeat()
-								.DistinctUntilChanged();
+								.DistinctUntilChanged()
+								.Replay(1);
+					replay.Connect();
+					_IsLocked = replay;
 				}
 				return _IsLocked;
 			}

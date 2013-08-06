@@ -9,7 +9,7 @@
         KeyDown="Window_KeyDown"
         xmlns:local="clr-namespace:GestSpace"
         >
-    <Grid x:Name="root" Background="#CC0C0C0C">
+    <Grid x:Name="root">
         <Border DataContext="{Binding Debug}" Visibility="Hidden" Background="Black" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Right">
             <UniformGrid Columns="2">
                 <TextBlock Margin="5">FPS</TextBlock>
