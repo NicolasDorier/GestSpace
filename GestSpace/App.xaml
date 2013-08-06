@@ -59,7 +59,7 @@
         <DataTemplate DataType="{x:Type local:ValuePresenterViewModel}">
             <local:ValuePresenterView></local:ValuePresenterView>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type local:UnusedPresenterViewModel}">
+        <DataTemplate DataType="{x:Type local:PresenterViewModel}">
             <Path Fill="{StaticResource NormalForegroundBrush}" Height="25" Data="{StaticResource PlusGeometry}" Stretch="Uniform"></Path>
         </DataTemplate>
 

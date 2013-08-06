@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace GestSpace
 {
-	public class ActionTemplateViewModel
+	public class PresenterTemplateViewModel
 	{
-		public ActionTemplateViewModel(string description, Func<ActionViewModel> createAction)
+		public PresenterTemplateViewModel(string description, Func<PresenterViewModel> createAction)
 			: this(description, null, createAction)
 		{
 		}
-		public ActionTemplateViewModel(string description, string suggestedName, Func<ActionViewModel> createAction)
+		public PresenterTemplateViewModel(string description, string suggestedName, Func<PresenterViewModel> createPresenter)
 		{
 			Description = description;
-			this._CreateAction = createAction;
+			this._CreatePresenter = createPresenter;
 			this.SuggestedName = suggestedName;
 		}
 		public string Description
@@ -24,20 +24,20 @@ namespace GestSpace
 			set;
 		}
 
-		Func<ActionViewModel> _CreateAction;
-		public ActionViewModel CreateAction()
+		Func<PresenterViewModel> _CreatePresenter;
+		public PresenterViewModel CreatePresenter()
 		{
-			return _CreateAction();
+			return _CreatePresenter();
 		}
 
-		ActionViewModel _Sample;
-		public ActionViewModel Sample
+		PresenterViewModel _Sample;
+		public PresenterViewModel Sample
 		{
 			get
 			{
 				if(_Sample == null)
 				{
-					_Sample = CreateAction();
+					_Sample = CreatePresenter();
 				}
 				return _Sample;
 			}

@@ -172,8 +172,8 @@
                 <TextBox></TextBox>-->
                 <TextBlock Text="Action"></TextBlock>
                 
-                <ComboBox ItemsSource="{Binding Main.ActionTemplates}"
-                          SelectedItem="{Binding SelectedActionTemplate, Mode=TwoWay}" >
+                <ComboBox ItemsSource="{Binding Main.PresenterTemplates}"
+                          SelectedItem="{Binding SelectedPresenterTemplate, Mode=TwoWay}" >
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>
@@ -184,7 +184,7 @@
                                 <ContentPresenter 
                                     Height="30"
                                     MaxHeight="30"
-                                    Content="{Binding Sample.Presenter}"></ContentPresenter>
+                                    Content="{Binding Sample}"></ContentPresenter>
                                 <TextBlock Grid.Column="1" 
                                            VerticalAlignment="Center"
                                            FontSize="13"

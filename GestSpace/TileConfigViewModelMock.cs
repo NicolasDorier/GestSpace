@@ -15,13 +15,13 @@ namespace GestSpace
 			that = this;
 			that.Description = "Volume";
 
-			var unused = new ActionTemplateViewModel("Not used", () => new UnusedActionViewModel());
+			var unused = new PresenterTemplateViewModel("Not used", () => PresenterViewModel.Unused);
 			that.Main = new DynamicViewModel();
-			that.Main.ActionTemplates = new List<ActionTemplateViewModel>()
+			that.Main.PresenterTemplates = new List<PresenterTemplateViewModel>()
 			{
 				unused
 			};
-			that.SelectedActionTemplate = unused;
+			that.SelectedPresenterTemplate = unused;
 
 		}
 

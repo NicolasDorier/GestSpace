@@ -104,10 +104,8 @@ namespace GestSpace
 			Subscribe(spaceListener);
 
 
-			_ActionTemplates.Add(new ActionTemplateViewModel("Not used", "", () => new UnusedActionViewModel()));
-			_ActionTemplates.Add(new ActionTemplateViewModel("Switch windows", () => new ActionViewModel()
-			{
-				Presenter = new MovePresenterViewModel
+			_PresenterTemplates.Add(new PresenterTemplateViewModel("Not used", "", () => PresenterViewModel.Unused));
+			_PresenterTemplates.Add(new PresenterTemplateViewModel("Switch windows", () => new MovePresenterViewModel
 				(
 				onEnter: Interpreter.Simulate("DOWN LWIN"),
 				onMoveUp: Interpreter.Simulate("PRESS TAB"),
@@ -117,11 +115,9 @@ namespace GestSpace
 										"UP SHIFT"),
 				onRelease: Interpreter.Simulate("UP LWIN")
 				)
-			}));
-			_ActionTemplates.Add(new ActionTemplateViewModel("Volume", () => new VolumeActionViewModel()));
-			_ActionTemplates.Add(new ActionTemplateViewModel("Dock window", () => new ActionViewModel()
-			{
-				Presenter = new ZonePresenterViewModel()
+			));
+			_PresenterTemplates.Add(new PresenterTemplateViewModel("Volume", () => VolumePresenterViewModel.Create()));
+			_PresenterTemplates.Add(new PresenterTemplateViewModel("Dock window", () => new ZonePresenterViewModel()
 				{
 					Up = new ZoneTransitionViewModel()
 					{
@@ -164,8 +160,8 @@ namespace GestSpace
 									"UP LWIN"),
 					},
 					Center = new ZoneTransitionViewModel()
-				}
-			}));
+
+				}));
 
 			//_Tiles.Add(new TileViewModel()
 			//{
@@ -186,7 +182,7 @@ namespace GestSpace
 
 			this.Tiles.Add(new TileViewModel()
 			{
-				Action = new UnusedActionViewModel()
+				Presenter = PresenterViewModel.Unused
 			});
 
 		}
@@ -296,7 +292,7 @@ namespace GestSpace
 				.Select(p => new TileViewModel()
 				{
 					Position = p.Position,
-					Action = new UnusedActionViewModel()
+					Presenter = PresenterViewModel.Unused
 				}).ToList();
 				foreach(var neightbour in neightbours)
 				{
@@ -357,12 +353,12 @@ namespace GestSpace
 
 		}
 
-		private readonly ObservableCollection<ActionTemplateViewModel> _ActionTemplates = new ObservableCollection<ActionTemplateViewModel>();
-		public ObservableCollection<ActionTemplateViewModel> ActionTemplates
+		private readonly ObservableCollection<PresenterTemplateViewModel> _PresenterTemplates = new ObservableCollection<PresenterTemplateViewModel>();
+		public ObservableCollection<PresenterTemplateViewModel> PresenterTemplates
 		{
 			get
 			{
-				return _ActionTemplates;
+				return _PresenterTemplates;
 			}
 		}
 

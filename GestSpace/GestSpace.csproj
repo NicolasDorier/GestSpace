@@ -88,8 +88,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ActionTemplateViewModel.cs" />
-    <Compile Include="ActionViewModel.cs" />
+    <Compile Include="PresenterTemplateViewModel.cs" />
     <Compile Include="AnonymousComparer.cs" />
     <Compile Include="ClickPresenterView.xaml.cs">
       <DependentUpon>ClickPresenterView.xaml</DependentUpon>
@@ -114,12 +113,11 @@
       <DependentUpon>TileView.xaml</DependentUpon>
     </Compile>
     <Compile Include="TileViewModel.cs" />
-    <Compile Include="UnusedActionViewModel.cs" />
     <Compile Include="ValuePresenterView.xaml.cs">
       <DependentUpon>ValuePresenterView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ValuePresenterViewModel.cs" />
-    <Compile Include="VolumeActionViewModel.cs" />
+    <Compile Include="VolumePresenterViewModel.cs" />
     <Compile Include="ZonePresenterView.xaml.cs">
       <DependentUpon>ZonePresenterView.xaml</DependentUpon>
     </Compile>

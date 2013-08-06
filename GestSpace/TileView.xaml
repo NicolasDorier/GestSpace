@@ -76,7 +76,7 @@
                 <ContentPresenter Height="75"
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Center"
-                                  Content="{Binding Action.Presenter}"></ContentPresenter>
+                                  Content="{Binding Presenter}"></ContentPresenter>
 
                 <TextBlock Grid.Row="1" Grid.Column="1"
                            Margin="0,105,0,0"

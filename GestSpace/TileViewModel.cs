@@ -38,7 +38,7 @@ namespace GestSpace
 				if(value != _Main)
 				{
 					_Main = value;
-					_SelectedActionTemplate = _Main.ActionTemplates.First();
+					_SelectedPresenterTemplate = _Main.PresenterTemplates.First();
 					OnPropertyChanged(() => this.Main);
 				}
 			}
@@ -72,25 +72,25 @@ namespace GestSpace
 			}
 		}
 
-		private ActionTemplateViewModel _SelectedActionTemplate;
-		public ActionTemplateViewModel SelectedActionTemplate
+		private PresenterTemplateViewModel _SelectedPresenterTemplate;
+		public PresenterTemplateViewModel SelectedPresenterTemplate
 		{
 			get
 			{
-				return _SelectedActionTemplate;
+				return _SelectedPresenterTemplate;
 			}
 			set
 			{
-				if(value != _SelectedActionTemplate)
+				if(value != _SelectedPresenterTemplate)
 				{
-					_SelectedActionTemplate = value;
-					Action = _SelectedActionTemplate.CreateAction();
-					if(TakeSuggestedName || _SelectedActionTemplate.Sample is UnusedActionViewModel)
+					_SelectedPresenterTemplate = value;
+					Presenter = _SelectedPresenterTemplate.CreatePresenter();
+					if(TakeSuggestedName || _SelectedPresenterTemplate.Sample == PresenterViewModel.Unused)
 					{
-						Description = _SelectedActionTemplate.SuggestedName;
+						Description = _SelectedPresenterTemplate.SuggestedName;
 						TakeSuggestedName = true;
 					}
-					OnPropertyChanged(() => this.SelectedActionTemplate);
+					OnPropertyChanged(() => this.SelectedPresenterTemplate);
 				}
 			}
 		}
@@ -180,7 +180,7 @@ namespace GestSpace
 			else
 			{
 				_TileListener.Disposable = Subscribe(Main.SpaceListener);
-				_PresenterSubscription.Disposable = Action.Presenter.Subscribe(Main.SpaceListener);
+				_PresenterSubscription.Disposable = Presenter.Subscribe(Main.SpaceListener);
 			}
 		}
 
@@ -189,25 +189,7 @@ namespace GestSpace
 			return null;
 		}
 
-		private ActionViewModel _Action = new ActionViewModel();
-		public ActionViewModel Action
-		{
-			get
-			{
-				return _Action;
-			}
-			set
-			{
-				if(value != _Action)
-				{
-					_Action = value;
-					UpdateListener();
-					OnPropertyChanged(() => this.Action);
-					OnPropertyChanged(() => this.IsUnused);
-				}
-			}
-		}
-
+	
 
 		private string _Description;
 		public string Description
@@ -231,7 +213,7 @@ namespace GestSpace
 		{
 			get
 			{
-				return Action is UnusedActionViewModel;
+				return Presenter == PresenterViewModel.Unused;
 			}
 		}
 
@@ -240,6 +222,26 @@ namespace GestSpace
 			get
 			{
 				return Main.State == MainViewState.Locked && _IsSelected;
+			}
+		}
+
+
+		private PresenterViewModel _Presenter;
+		public PresenterViewModel Presenter
+		{
+			get
+			{
+				return _Presenter;
+			}
+			set
+			{
+				if(value != _Presenter)
+				{
+					_Presenter = value;
+					UpdateListener();
+					OnPropertyChanged(() => this.IsUnused);
+					OnPropertyChanged(() => this.Presenter);
+				}
 			}
 		}
 

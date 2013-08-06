@@ -8,14 +8,13 @@ using System.Threading.Tasks;
 
 namespace GestSpace
 {
-	public class VolumeActionViewModel : ActionViewModel
+	public class VolumePresenterViewModel : ValuePresenterViewModel
 	{
-		public VolumeActionViewModel()
+		public static VolumePresenterViewModel Create()
 		{
 			MMDeviceEnumerator devEnum = new MMDeviceEnumerator();
 			MMDevice defaultDevice = devEnum.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
-			Presenter =
-				new ValuePresenterViewModel(
+			return new VolumePresenterViewModel(
 					minValue: 0,
 					maxValue: 100,
 					setValue: (v) => defaultDevice.AudioEndpointVolume.MasterVolumeLevelScalar = (float)(v / 100.0),
@@ -25,6 +24,11 @@ namespace GestSpace
 										.Select(n=>n.MasterVolume)
 										 .Merge(Observable.Return(defaultDevice.AudioEndpointVolume.MasterVolumeLevelScalar))
 										 .Select(v=>(double)(v * 100.0)));
+		}
+		public VolumePresenterViewModel(double minValue, double maxValue, IObservable<double> getValue, Action<double> setValue)
+			:base(minValue, maxValue, getValue, setValue)
+		{
+			
 		}
 
 	}

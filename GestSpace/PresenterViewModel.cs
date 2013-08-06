@@ -11,6 +11,8 @@ namespace GestSpace
 {
 	public class PresenterViewModel : NotifyPropertyChangedBase, IDisposable
 	{
+		public readonly static PresenterViewModel Unused = new PresenterViewModel();
+
 		public static SynchronizationContext UI = SynchronizationContext.Current;
 		public virtual IDisposable Subscribe(ReactiveSpace spaceListener)
 		{
