@@ -13,12 +13,8 @@ namespace GestSpace
 		void Empty()
 		{
 		}
-		public MovePresenterViewModel(Action onEnter, Action onMoveUp, Action onMoveDown, Action onRelease)
+		public MovePresenterViewModel()
 		{
-			OnEnter = onEnter ?? Empty;
-			OnMoveUp = onMoveUp ?? Empty;
-			OnMoveDown = onMoveDown ?? Empty;
-			OnRelease = onRelease ?? Empty;
 			MinInterval = 50.0;
 		}
 		int _HandsCount;
@@ -34,9 +30,11 @@ namespace GestSpace
 				if(_HandsCount < 0)
 					_HandsCount = 0;
 				if(_HandsCount == 0)
-					OnRelease();
+					if(OnRelease != null)
+						OnRelease();
 				if(_HandsCount == 1)
-					OnEnter();
+					if(OnEnter != null)
+						OnEnter();
 			}
 		}
 
@@ -46,11 +44,28 @@ namespace GestSpace
 			set;
 		}
 
-		private Action OnEnter;
-		private Action OnRelease;
-		private Action OnMoveUp;
-		private Action OnMoveDown;
+		public Action OnEnter
+		{
+			get;
+			set;
+		}
+		public Action OnRelease
+		{
+			get;
+			set;
+		}
+		public Action OnMoveUp
+		{
+			get;
+			set;
+		}
+		public Action OnMoveDown
+		{
+			get;
+			set;
+		}
 
+		
 		public int PreviousBin
 		{
 			get;
@@ -97,11 +112,13 @@ namespace GestSpace
 					var bin = (int)(diff / MinInterval);
 					if(bin < PreviousBin)
 					{
-						OnMoveDown();
+						if(OnMoveDown != null)
+							OnMoveDown();
 					}
 					if(bin > PreviousBin)
 					{
-						OnMoveUp();
+						if(OnMoveUp != null)
+							OnMoveUp();
 					}
 					PreviousBin = bin;
 				}));

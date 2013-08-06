@@ -59,7 +59,7 @@ namespace GestSpace
 			{
 				UpPart.Visibility = ToVisibility(ViewModel.CanGoUp);
 				DownPart.Visibility = ToVisibility(ViewModel.CanGoDown);
-				CentralPart.Visibility = ToVisibility(ViewModel.CanClick);
+				CenterPart.Visibility = ToVisibility(ViewModel.CanClick);
 				RightPart.Visibility = ToVisibility(ViewModel.CanGoRight);
 				LeftPart.Visibility = ToVisibility(ViewModel.CanGoLeft);
 			}

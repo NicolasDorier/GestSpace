@@ -105,16 +105,16 @@ namespace GestSpace
 
 
 			_PresenterTemplates.Add(new PresenterTemplateViewModel("Not used", "", () => PresenterViewModel.Unused));
-			_PresenterTemplates.Add(new PresenterTemplateViewModel("Switch windows", () => new MovePresenterViewModel
-				(
-				onEnter: Interpreter.Simulate("DOWN LWIN"),
-				onMoveUp: Interpreter.Simulate("PRESS TAB"),
-				onMoveDown: Interpreter.Simulate(
-										"DOWN SHIFT",
-										"PRESS TAB",
-										"UP SHIFT"),
-				onRelease: Interpreter.Simulate("UP LWIN")
-				)
+			_PresenterTemplates.Add(new PresenterTemplateViewModel("Switch windows", () => new MovePresenterViewModel()
+				{
+					OnEnter = Interpreter.Simulate("DOWN LWIN"),
+					OnMoveUp = Interpreter.Simulate("PRESS TAB"),
+					OnMoveDown = Interpreter.Simulate(
+											"DOWN SHIFT",
+											"PRESS TAB",
+											"UP SHIFT"),
+					OnRelease = Interpreter.Simulate("UP LWIN")
+				}
 			));
 			_PresenterTemplates.Add(new PresenterTemplateViewModel("Volume", () => VolumePresenterViewModel.Create()));
 			_PresenterTemplates.Add(new PresenterTemplateViewModel("Dock window", () => new ZonePresenterViewModel()
@@ -162,7 +162,12 @@ namespace GestSpace
 					Center = new ZoneTransitionViewModel()
 
 				}));
-
+			_PresenterTemplates.Add(new PresenterTemplateViewModel("Close window", () => new ClickPresenterViewModel()
+			{
+				OnClicked = Interpreter.Simulate(
+							"DOWN ALT,F4",
+							"UP ALT,F4")
+			}));
 			//_Tiles.Add(new TileViewModel()
 			//{
 			//	Position = new Point(0, 1),

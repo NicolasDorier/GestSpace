@@ -9,11 +9,7 @@ namespace GestSpace
 {
 	public class ClickPresenterViewModel : PresenterViewModel
 	{
-		Action _OnClicked;
-		Action _OnUp;
-		Action _OnDown;
-		Action _OnLeft;
-		Action _OnRight;
+
 		public ClickPresenterViewModel(
 			Action onClicked = null,
 			Action onDown = null,
@@ -21,13 +17,8 @@ namespace GestSpace
 			Action onLeft = null,
 			Action onRight = null)
 		{
-			_OnClicked = Wrap("Center", onClicked);
-			_OnUp = Wrap("Up", onUp);
-			_OnDown = Wrap("Down", onDown);
-			_OnRight = Wrap("Right", onRight);
-			_OnLeft = Wrap("Left", onLeft);
-			_MinInterval = TimeSpan.FromMilliseconds(300);
-			VelocityThreshold = 1000;
+			_MinInterval = TimeSpan.FromMilliseconds(500);
+			VelocityThreshold = 500;
 		}
 
 		private Action Wrap(string side, Action act)
@@ -74,20 +65,33 @@ namespace GestSpace
 				.ObserveOn(UI)
 				.Subscribe(h =>
 				{
-					if(_OnClicked != null)
-						_OnClicked();
+					if(OnClicked != null)
+					{
+						LastSide = "Center";
+						OnClicked();
+					}
 
 					if(Math.Abs(h.PalmVelocity.y) > VelocityThreshold)
 					{
-						var upOrDown = h.PalmVelocity.y < 0.0 ? _OnDown : _OnUp;
+						var isDown = h.PalmVelocity.y < 0.0;
+						var upOrDown = isDown ? OnDown : OnUp;
+						var side = isDown ? "Down" : "Up";
 						if(upOrDown != null)
+						{
+							LastSide = side;
 							upOrDown();
+						}
 					}
 					else
 					{
-						var leftOrRight = h.PalmVelocity.x < 0.0 ? _OnLeft : _OnRight;
+						var isLeft = h.PalmVelocity.x < 0.0;
+						var leftOrRight = isLeft ? OnLeft : OnRight;
+						var side = isLeft ? "Left" : "Right";
 						if(leftOrRight != null)
+						{
+							LastSide = side;
 							leftOrRight();
+						}
 					}
 				});
 
@@ -102,51 +106,78 @@ namespace GestSpace
 			}
 			set
 			{
-				if(value != _LastSide)
-				{
-					_LastSide = value;
-					OnPropertyChanged(() => this.LastSide);
-				}
+				_LastSide = null;
+				OnPropertyChanged(() => this.LastSide);
+				_LastSide = value;
+				OnPropertyChanged(() => this.LastSide);
+				Console.WriteLine("click");
 			}
 		}
 
+
+
+		public Action OnUp
+		{
+			get;
+			set;
+		}
 		public bool CanGoUp
 		{
 			get
 			{
-				return _OnUp != null;
+				return OnUp != null;
 			}
 		}
 
+		public Action OnDown
+		{
+			get;
+			set;
+		}
 		public bool CanGoDown
 		{
 			get
 			{
-				return _OnDown != null;
+				return OnDown != null;
 			}
 		}
 
+		public Action OnClicked
+		{
+			get;
+			set;
+		}
 		public bool CanClick
 		{
 			get
 			{
-				return _OnClicked != null;
+				return OnClicked != null;
 			}
 		}
 
+		public Action OnRight
+		{
+			get;
+			set;
+		}
 		public bool CanGoRight
 		{
 			get
 			{
-				return _OnRight != null;
+				return OnRight != null;
 			}
 		}
 
+		public Action OnLeft
+		{
+			get;
+			set;
+		}
 		public bool CanGoLeft
 		{
 			get
 			{
-				return _OnLeft != null;
+				return OnLeft != null;
 			}
 		}
 	}

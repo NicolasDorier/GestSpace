@@ -49,7 +49,7 @@
                     </Path.RenderTransform>
                 </Path>
                 <Ellipse 
-                         x:Name="CentralPart"
+                         x:Name="CenterPart"
                          Fill="{StaticResource NormalForegroundBrush}"
                          Height="40"
                          Width="40"
