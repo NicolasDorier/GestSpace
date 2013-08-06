@@ -98,7 +98,7 @@
     <Compile Include="Helper.cs" />
     <Compile Include="Interop\WinAPI.cs" />
     <Compile Include="Interpreter.cs" />
-    <Compile Include="KeyboardActionViewModel.cs" />
+    <Compile Include="InterpreterViewModel.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="MovePresenterViewModel.cs" />
     <Compile Include="PresenterViewModel.cs" />

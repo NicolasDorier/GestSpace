@@ -4,12 +4,23 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WindowsInput;
 
 namespace GestSpace
 {
-	public enum InterpreterCommandType
+	public class CommandBinding
 	{
-		Press,
+		public string CommandType
+		{
+			get;
+			set;
+		}
+
+		public Action<string[]> Do
+		{
+			get;
+			set;
+		}
 	}
 	public class InterpreterCommand
 	{
@@ -17,7 +28,7 @@ namespace GestSpace
 		{
 			Parameters = new List<string>();
 		}
-		public InterpreterCommandType CommandType
+		public string CommandType
 		{
 			get;
 			set;
@@ -28,6 +39,29 @@ namespace GestSpace
 			set;
 		}
 	}
+
+	[Serializable]
+	public class InterpreterException : Exception
+	{
+		public InterpreterException()
+		{
+		}
+		public InterpreterException(string message)
+			: base(message)
+		{
+		}
+		public InterpreterException(string message, Exception inner)
+			: base(message, inner)
+		{
+		}
+		protected InterpreterException(
+		  System.Runtime.Serialization.SerializationInfo info,
+		  System.Runtime.Serialization.StreamingContext context)
+			: base(info, context)
+		{
+		}
+	}
+
 	public class Interpreter
 	{
 		enum Token
@@ -84,7 +118,7 @@ namespace GestSpace
 				if(_CurrentToken == Token.None || _CurrentToken == Token.EOF)
 				{
 					var result = (char)c + ReadUntil(' ');
-					var command = (InterpreterCommandType)Enum.Parse(typeof(InterpreterCommandType), result, true);
+					var command = result;
 					_CurrentToken = Token.Command;
 					Value = command;
 					return true;
@@ -132,7 +166,7 @@ namespace GestSpace
 
 			private void ThrowInvalidToken()
 			{
-				throw new FormatException("Invalid token");
+				throw new InterpreterException("Invalid token");
 			}
 
 			public object Value
@@ -140,6 +174,97 @@ namespace GestSpace
 				get;
 				set;
 			}
+		}
+
+
+		private readonly List<CommandBinding> _CommandBindings = new List<CommandBinding>();
+		public List<CommandBinding> CommandBindings
+		{
+			get
+			{
+				return _CommandBindings;
+			}
+		}
+
+		public Interpreter()
+		{
+			AddCommandBinding("PRESS", (args) =>
+			{
+				foreach(var arg in args.Select(a => ToVK(a)).ToList())
+				{
+					InputSimulator.SimulateKeyPress(arg);
+				}
+			});
+			AddCommandBinding("UP", (args) =>
+			{
+				foreach(var arg in args.Select(a => ToVK(a)).ToList())
+				{
+					InputSimulator.SimulateKeyUp(arg);
+				}
+			});
+			AddCommandBinding("DOWN", (args) =>
+			{
+				foreach(var arg in args.Select(a => ToVK(a)).ToList())
+				{
+					InputSimulator.SimulateKeyDown(arg);
+				}
+			});
+		}
+
+		Dictionary<string, VirtualKeyCode> _Aliases =
+			new object[][]
+			{
+				new Object[]{"alt", VirtualKeyCode.MENU}
+			}.ToDictionary(o => (string)o[0], o => (VirtualKeyCode)o[1]);
+
+		private VirtualKeyCode ToVK(string key)
+		{
+			VirtualKeyCode result;
+			if(Enum.TryParse<VirtualKeyCode>(key, out result))
+				return result;
+			if(_Aliases.TryGetValue(key.ToLowerInvariant(), out result))
+				return result;
+
+			throw new InterpreterException(key + " is not a valid parameter");
+		}
+
+		void AddCommandBinding(string commandType, Action<string[]> run)
+		{
+			CommandBindings.Add(new CommandBinding()
+			{
+				CommandType = commandType,
+				Do = run
+			});
+		}
+
+		public void Interpret(string txt)
+		{
+			Interpret(Parse(txt));
+		}
+
+		public void Interpret(IEnumerable<InterpreterCommand> commands)
+		{
+			foreach(var cmd in commands)
+			{
+				var binding = Find(cmd.CommandType);
+				if(binding == null)
+					throw new InterpreterException("Command " + cmd.CommandType + " not found");
+				binding.Do(cmd.Parameters.ToArray());
+			}
+		}
+
+		public void Interpret(params string[] commands)
+		{
+			Interpret(String.Join("\r\n", commands));
+		}
+
+		private CommandBinding Find(string command)
+		{
+			return CommandBindings.FirstOrDefault(o => o.CommandType == command.ToUpperInvariant());
+		}
+		public IEnumerable<InterpreterCommand> Parse(params string[] commands)
+		{
+			return Parse(String.Join("\r\n", commands));
 		}
 		public IEnumerable<InterpreterCommand> Parse(string txt)
 		{
@@ -152,14 +277,24 @@ namespace GestSpace
 				if(reader.CurrentToken == Token.EOF && command != null)
 					yield return command;
 				if(reader.CurrentToken == Token.Command)
+				{
+					var binding = Find((string)reader.Value);
+					if(binding == null)
+						throw new InterpreterException("Command " + reader.Value + " does not exists, available commands are : " + PrintCommands());
 					command = new InterpreterCommand()
 					{
-						CommandType = (InterpreterCommandType)reader.Value
+						CommandType = (string)reader.Value
 					};
+				}
 				if(reader.CurrentToken == Token.Parameter)
 					command.Parameters.Add((string)reader.Value);
 			}
 
+		}
+
+		private string PrintCommands()
+		{
+			return String.Join(",", CommandBindings.Select(b => b.CommandType).ToArray());
 		}
 	}
 }

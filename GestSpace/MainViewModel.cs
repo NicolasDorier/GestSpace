@@ -94,7 +94,7 @@ namespace GestSpace
 	}
 	public class MainViewModel : NotifyPropertyChangedBase
 	{
-
+		InterpreterViewModel Interpreter = new InterpreterViewModel(new Interpreter());
 		public MainViewModel(ReactiveSpace spaceListener)
 		{
 
@@ -105,7 +105,19 @@ namespace GestSpace
 
 
 			_ActionTemplates.Add(new ActionTemplateViewModel("Not used", "", () => new UnusedActionViewModel()));
-			_ActionTemplates.Add(new ActionTemplateViewModel("Switch windows", () => KeyboardActionViewModel.CreateSwitchWindow()));
+			_ActionTemplates.Add(new ActionTemplateViewModel("Switch windows", () => new ActionViewModel()
+			{
+				Presenter = new MovePresenterViewModel
+				(
+				onEnter: Interpreter.Simulate("DOWN LWIN"),
+				onMoveUp: Interpreter.Simulate("PRESS TAB"),
+				onMoveDown: Interpreter.Simulate(
+										"DOWN SHIFT",
+										"PRESS TAB",
+										"UP SHIFT"),
+				onRelease: Interpreter.Simulate("UP LWIN")
+				)
+			}));
 			_ActionTemplates.Add(new ActionTemplateViewModel("Volume", () => new VolumeActionViewModel()));
 			_ActionTemplates.Add(new ActionTemplateViewModel("Dock window", () => new ActionViewModel()
 			{
@@ -113,91 +125,45 @@ namespace GestSpace
 				{
 					Up = new ZoneTransitionViewModel()
 					{
-						OnEnter = () =>
-						{
-							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-							InputSimulator.SimulateKeyPress(VirtualKeyCode.UP);
-							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-						},
-						OnLeave = () =>
-						{
-							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-							InputSimulator.SimulateKeyPress(VirtualKeyCode.DOWN);
-							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-						}
+						OnEnter = Interpreter.Simulate(
+									"DOWN LWIN",
+									"PRESS UP",
+									"UP LWIN"),
+						OnLeave = Interpreter.Simulate(
+									"DOWN LWIN",
+									"PRESS DOWN",
+									"UP LWIN"),
 					},
 					Down = new ZoneTransitionViewModel()
 					{
-						OnEnter = () =>
-						{
-							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-							InputSimulator.SimulateKeyPress(VirtualKeyCode.DOWN);
-							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-						},
-						//OnLeave = () =>
-						//{
-						//	InputSimulator.SimulateKeyDown(VirtualKeyCode.MENU);
-						//	InputSimulator.SimulateKeyDown(VirtualKeyCode.SHIFT);
-						//	InputSimulator.SimulateKeyPress(VirtualKeyCode.TAB);
-						//	InputSimulator.SimulateKeyUp(VirtualKeyCode.MENU);
-						//	InputSimulator.SimulateKeyUp(VirtualKeyCode.SHIFT);
-						//}
+						OnEnter = Interpreter.Simulate(
+									"DOWN LWIN",
+									"PRESS DOWN",
+									"UP LWIN"),
 					},
 					Right = new ZoneTransitionViewModel()
 					{
-						OnEnter = () =>
-						{
-							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-							InputSimulator.SimulateKeyPress(VirtualKeyCode.RIGHT);
-							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-						},
-						OnLeave = () =>
-						{
-							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-							InputSimulator.SimulateKeyPress(VirtualKeyCode.LEFT);
-							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-						}
+						OnEnter = Interpreter.Simulate(
+									"DOWN LWIN",
+									"PRESS RIGHT",
+									"UP LWIN"),
+						OnLeave = Interpreter.Simulate(
+									"DOWN LWIN",
+									"PRESS LEFT",
+									"UP LWIN"),
 					},
 					Left = new ZoneTransitionViewModel()
 					{
-						OnEnter = () =>
-						{
-							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-							InputSimulator.SimulateKeyPress(VirtualKeyCode.LEFT);
-							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-						},
-						OnLeave = () =>
-						{
-							InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-							InputSimulator.SimulateKeyPress(VirtualKeyCode.RIGHT);
-							InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-						}
+						OnEnter = Interpreter.Simulate(
+									"DOWN LWIN",
+									"PRESS LEFT",
+									"UP LWIN"),
+						OnLeave = Interpreter.Simulate(
+									"DOWN LWIN",
+									"PRESS RIGHT",
+									"UP LWIN"),
 					},
 					Center = new ZoneTransitionViewModel()
-					//onUp: () =>
-					//{
-					//	InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-					//	InputSimulator.SimulateKeyPress(VirtualKeyCode.UP);
-					//	InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-					//},
-					//onDown: () =>
-					//{
-					//	InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-					//	InputSimulator.SimulateKeyPress(VirtualKeyCode.DOWN);
-					//	InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-					//},
-					//onLeft:() =>
-					//{
-					//	InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-					//	InputSimulator.SimulateKeyPress(VirtualKeyCode.LEFT);
-					//	InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-					//},
-					//onRight: () =>
-					//{
-					//	InputSimulator.SimulateKeyDown(VirtualKeyCode.LWIN);
-					//	InputSimulator.SimulateKeyPress(VirtualKeyCode.RIGHT);
-					//	InputSimulator.SimulateKeyUp(VirtualKeyCode.LWIN);
-					//}
 				}
 			}));
 
@@ -448,7 +414,6 @@ namespace GestSpace
 
 		internal TileViewModel SelectTile(double angle)
 		{
-			Console.WriteLine("Angle : " + (int)angle);
 			if(CurrentTile == null)
 				CurrentTile = Tiles.FirstOrDefault();
 			if(CurrentTile == null)
@@ -503,7 +468,6 @@ namespace GestSpace
 				if(value != _State)
 				{
 					_State = value;
-					Console.WriteLine("New state : " + value);
 					if(CurrentTile != null)
 						CurrentTile.IsLockedChanged();
 					OnPropertyChanged(() => this.State);

@@ -174,10 +174,32 @@ namespace GestSpace
 
 		ReactiveListener listener;
 		void MainWindow_Loaded(object sender, RoutedEventArgs e)
-		{	
+		{
 			var ui = SynchronizationContext.Current;
 
-			
+			//listener
+			//	.FingersMoves
+			//	.SelectMany(f => f.ToList().Select(l =>
+			//	new
+			//	{
+			//		Key = f.Key,
+			//		Fingers = l
+			//	}))
+			//	.Subscribe(f =>
+			//	{
+			//		Console.WriteLine("finger");
+			//		try
+			//		{
+			//			//var max = f.Fingers.Select(ff => GetAngle(ff)).Where(a => a != null).Select(a => a.Value).Max();
+			//			var av = f.Fingers.Select(ff => GetAngle(ff)).Where(a => a != null).Select(a => a.Value).Average();
+			//			Console.WriteLine("av : " + ((int)av));
+			//		}
+			//		catch
+			//		{
+			//			Console.WriteLine("Ex");
+			//		}
+			//	});
+
 			var centers =
 				listener
 				.FingersMoves
@@ -206,7 +228,6 @@ namespace GestSpace
 				{
 					if(ViewModel.Debug.FingerCount <= 2 && ViewModel.State == MainViewState.Navigating)
 					{
-						Console.WriteLine("Center : " + ToString(o.Center) + " Move " + ToString(o.Position));
 						var angle = Helper.RadianToDegree(Math.Atan2(o.Move.y, o.Move.x));
 						var selected = ViewModel.SelectTile(angle);
 						if(selected != null)
@@ -214,11 +235,39 @@ namespace GestSpace
 					}
 				});
 
-		
+
 
 
 			Maximize();
 			Center();
+		}
+
+		private int? GetAngle(Finger f)
+		{
+			var point = f.Hand.PalmPosition;
+			var direction = f.Hand.Direction;
+			var fingerPosition = f.TipPosition;
+			if(point.Equals(Leap.Vector.Zero))
+				return null;
+			if(direction.Equals(Leap.Vector.Zero))
+				return null;
+			if(fingerPosition.Equals(Leap.Vector.Zero))
+				return null;
+			//Console.WriteLine("Palm " + point.NiceToString());
+			//Console.WriteLine("Direction " + direction);
+			//Console.WriteLine("Finger " + fingerPosition.NiceToString());
+
+
+			var h = f.Hand.PalmNormal * (point.Dot(f.Hand.PalmNormal) / f.Hand.PalmNormal.MagnitudeSquared);
+
+			var ph = h - point;
+			//Console.WriteLine(pToProj.NiceToString());
+			//Console.WriteLine("Projection " + pToProj);
+
+
+			var angle = Math.Acos((direction.Dot(ph)) / (direction.Magnitude * ph.Magnitude));
+			//Console.WriteLine("Angle : " + Helper.RadianToDegree(angle));
+			return (int)Helper.RadianToDegree(angle);
 		}
 
 		private string ToString(Leap.Vector vector)

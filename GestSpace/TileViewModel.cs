@@ -239,7 +239,6 @@ namespace GestSpace
 		{
 			get
 			{
-				Console.WriteLine(Main.State);
 				return Main.State == MainViewState.Locked && _IsSelected;
 			}
 		}

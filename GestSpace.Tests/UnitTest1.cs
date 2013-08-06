@@ -14,11 +14,11 @@ namespace GestSpace.Tests
 			var commands = interpreter.Parse("PRESS A,B,C").ToList();
 			Assert.AreEqual(1, commands.Count);
 			var result = commands.First();
-			Assert.AreEqual(InterpreterCommandType.Press, result.CommandType);
+			Assert.AreEqual("PRESS", result.CommandType);
 			Assert.AreEqual(3, result.Parameters.Count);
 
 			Assert.AreEqual(0, interpreter.Parse("").Count());
-			Assert.AreEqual(0, interpreter.Parse(null).Count());
+			Assert.AreEqual(0, interpreter.Parse(null as string).Count());
 		}
 
 		[TestMethod]
@@ -28,7 +28,7 @@ namespace GestSpace.Tests
 			var commands = interpreter.Parse("PRESS A,\"B\",C").ToList();
 			Assert.AreEqual(1, commands.Count);
 			var result = commands.First();
-			Assert.AreEqual(InterpreterCommandType.Press, result.CommandType);
+			Assert.AreEqual("PRESS", result.CommandType);
 			Assert.AreEqual(3, result.Parameters.Count);
 			Assert.AreEqual("B", result.Parameters[1]);
 		}
