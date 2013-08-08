@@ -14,7 +14,7 @@
             <Setter Property="MinWidth" Value="200"></Setter>
             <Setter Property="MaxWidth" Value="200"></Setter>
             <Setter Property="Margin" Value="10,0,0,10"></Setter>
-            
+
             <Setter Property="FontSize" Value="13"></Setter>
             <Setter Property="Foreground" Value="{DynamicResource NormalForegroundBrush}"></Setter>
             <Setter Property="VerticalAlignment" Value="Center"></Setter>
@@ -60,7 +60,7 @@
                     <ControlTemplate TargetType="ComboBox">
                         <Grid>
                             <ToggleButton x:Name="ToggleButton"
-                       
+                       Cursor="Hand"
                         Grid.Column="2"
                         Focusable="false"
                         ClickMode="Press"
@@ -74,6 +74,11 @@
                                     </ControlTemplate>
                                 </ToggleButton.Template>
                             </ToggleButton>
+                            <Path Data="M 0 0 L 5 5 L 10 0 Z" 
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,10,0"
+                                  Stroke="{StaticResource NormalForegroundBrush}"></Path>
                             <ContentPresenter x:Name="ContentSite"
                             IsHitTestVisible="False"
                             Content="{TemplateBinding SelectionBoxItem}"
@@ -118,15 +123,140 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            
+
         </Style>
+
+        <DataTemplate x:Key="TabHeaderTemplate">
+            <TextBlock Text="{Binding}"
+                       FontWeight="SemiBold"
+                       FontSize="15"></TextBlock>
+        </DataTemplate>
+        <Style  TargetType="{x:Type TabControl}">
+            <Setter Property="OverridesDefaultStyle"
+          Value="True" />
+            <Setter Property="SnapsToDevicePixels"
+          Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabControl}">
+                        <Grid KeyboardNavigation.TabNavigation="Local">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Disabled">
+                                        <Storyboard>
+                                            <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border"
+                                                Storyboard.TargetProperty="(Border.BorderBrush).
+                    (SolidColorBrush.Color)">
+                                                <EasingColorKeyFrame KeyTime="0"
+                                         Value="#FFAAAAAA" />
+                                            </ColorAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <TabPanel x:Name="HeaderPanel"
+                    Grid.Row="0"
+                    Panel.ZIndex="1"
+                    Margin="0,0,4,-1"
+                    IsItemsHost="True"
+                    KeyboardNavigation.TabIndex="1"
+                    Background="Transparent" />
+
+
+                            <Border x:Name="Border"
+                  Grid.Row="1"
+                  BorderThickness="1"
+                  CornerRadius="2"
+                  KeyboardNavigation.TabNavigation="Local"
+                  KeyboardNavigation.DirectionalNavigation="Contained"
+                  KeyboardNavigation.TabIndex="2">
+                                <Grid>
+                                    <Rectangle 
+                                    Grid.Row="1"
+                                     Stroke="{StaticResource LightForegroundBrush}" 
+                                      StrokeThickness="1"
+                                      VerticalAlignment="Top"
+                                      HorizontalAlignment="Stretch"></Rectangle>
+                                    <ContentPresenter 
+                                        x:Name="PART_SelectedContentHost"
+                              Margin="4,20,4,4"
+                              ContentSource="SelectedContent" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type TabItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Grid x:Name="Root">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="SelectionStates">
+                                    <VisualState x:Name="Unselected" />
+                                    <VisualState x:Name="Selected">
+                                        <Storyboard>
+                                            <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border"
+                                                Storyboard.TargetProperty="(Panel.Background).
+                    (SolidColorBrush.Color)">
+                                                <EasingColorKeyFrame KeyTime="0"
+                                         Value="{StaticResource AltBackground}" />
+                                            </ColorAnimationUsingKeyFrames>
+                                            <ThicknessAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.BorderThickness)"
+                                                    Storyboard.TargetName="Border">
+                                                <EasingThicknessKeyFrame KeyTime="0"
+                                             Value="1,1,1,0" />
+                                            </ThicknessAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="MouseOver" />
+                                    <VisualState x:Name="Disabled">
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Border x:Name="Border"
+                  Margin="0,0,-4,0"
+                  BorderThickness="1,1,1,1"
+                  CornerRadius="0" 
+                                    Background="{StaticResource BackgroundBrush}">
+                                <ContentPresenter x:Name="ContentSite"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Center"
+                              ContentSource="Header"
+                              Margin="12,2,12,2"
+                              RecognizesAccessKey="True" />
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected"
+                   Value="True">
+                                <Setter Property="Panel.ZIndex"
+                    Value="100" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibility"></BooleanToVisibilityConverter>
     </UserControl.Resources>
     <Border 
         x:Name="border"
         IsHitTestVisible="True"
         Background="{DynamicResource BackgroundBrush}" 
         BorderThickness="3"
-        Padding="20"
         BorderBrush="{DynamicResource LightForegroundBrush}" >
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="ShowStates">
@@ -155,46 +285,84 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid>
-            <TextBlock Text="X"
-                       Cursor="Hand"
-                       MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
-                       VerticalAlignment="Top" 
-                       Margin="0,-20,-15,0" 
-                       HorizontalAlignment="Right"></TextBlock>
-            <controls:AutoArrangeGrid>
-                <controls:AutoArrangeGrid.ColumnDefinitions>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                </controls:AutoArrangeGrid.ColumnDefinitions>
-                <TextBlock Text="Name"></TextBlock>
-                <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                <!--<TextBlock Text="Shor"></TextBlock>
+            
+
+            <TabControl Padding="20">
+                <TabItem Header="Main" HeaderTemplate="{StaticResource TabHeaderTemplate}">
+                    <DockPanel Grid.IsSharedSizeScope="True">
+                        <controls:AutoArrangeGrid DockPanel.Dock="Top">
+                            <controls:AutoArrangeGrid.ColumnDefinitions>
+                                <ColumnDefinition SharedSizeGroup="labels"></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </controls:AutoArrangeGrid.ColumnDefinitions>
+                            <TextBlock Text="Name"></TextBlock>
+                            <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                            <!--<TextBlock Text="Shor"></TextBlock>
                 <TextBox></TextBox>-->
-                <TextBlock Text="Action"></TextBlock>
-                
-                <ComboBox ItemsSource="{Binding Main.PresenterTemplates}"
+                            <TextBlock Text="Template"></TextBlock>
+
+                            <ComboBox ItemsSource="{Binding Main.PresenterTemplates}"
                           SelectedItem="{Binding SelectedPresenterTemplate, Mode=TwoWay}" >
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="50"></ColumnDefinition>
-                                    <ColumnDefinition></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <ContentPresenter 
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                                <ColumnDefinition></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <ContentPresenter 
                                     Height="30"
                                     MaxHeight="30"
                                     Content="{Binding Sample}"></ContentPresenter>
-                                <TextBlock Grid.Column="1" 
+                                            <TextBlock Grid.Column="1" 
                                            VerticalAlignment="Center"
                                            FontSize="13"
                                            Margin="10,0,0,0"
                                            Text="{Binding Description}"></TextBlock>
-                            </Grid>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-            </controls:AutoArrangeGrid>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </controls:AutoArrangeGrid>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Header="Events" HeaderTemplate="{StaticResource TabHeaderTemplate}" Visibility="{Binding HasEvents, Converter={StaticResource BooleanToVisibility}}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="labels"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Events"></TextBlock>
+                        <ComboBox 
+                      Grid.Column="1"
+                      ItemsSource="{Binding Events}" 
+                      SelectedItem="{Binding SelectedEvent, Mode=TwoWay}"
+                      DisplayMemberPath="Name">
+                        </ComboBox>
+                        <TextBox Grid.Column="1" 
+                         Grid.Row="1"
+                                     AcceptsReturn="True"
+                                     TextWrapping="NoWrap"
+                                     MaxHeight="100"
+                                     Height="100"
+                                     IsEnabled="{Binding CanModifyScript}" 
+                                     Text="{Binding SelectedEvent.Command.Script, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+
+            <TextBlock 
+                       DockPanel.Dock="Top"
+                       Text="X"
+                       Cursor="Hand"
+                       MouseLeftButtonDown="TextBlock_MouseLeftButtonDown"
+                       VerticalAlignment="Top" 
+                       Margin="0,0,5,0" 
+                       HorizontalAlignment="Right"></TextBlock>
         </Grid>
     </Border>
 </UserControl>

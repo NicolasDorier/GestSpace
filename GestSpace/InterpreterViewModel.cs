@@ -12,20 +12,20 @@ namespace GestSpace
 		private InterpreterViewModel interpreterViewModel;
 		
 
-		private string[] _Commands;
-		public string[] Commands
+		private string _Script;
+		public string Script
 		{
 			get
 			{
-				return _Commands;
+				return _Script;
 			}
 			set
 			{
-				if(value != _Commands)
+				if(value != _Script)
 				{
-					_Commands = value;
+					_Script = value;
 					Parse();
-					OnPropertyChanged(() => this.Commands);
+					OnPropertyChanged(() => this.Script);
 				}
 			}
 		}
@@ -36,7 +36,7 @@ namespace GestSpace
 			Exception = null;
 			try
 			{
-				_ParsedCommands = interpreterViewModel._Interpreter.Parse(Commands);
+				_ParsedCommands = interpreterViewModel._Interpreter.Parse(Script);
 			}
 			catch(InterpreterException ex)
 			{
@@ -61,13 +61,15 @@ namespace GestSpace
 			}
 		}
 
+
+
 		IEnumerable<InterpreterCommand> _ParsedCommands;
 
 
 		public InterpreterCommandViewModel(InterpreterViewModel interpreterViewModel, string[] commands)
 		{
 			this.interpreterViewModel = interpreterViewModel;
-			this.Commands = commands;
+			this.Script = String.Join("\r\n",commands);
 		}
 
 		public void Execute()

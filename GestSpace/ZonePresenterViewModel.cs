@@ -185,5 +185,22 @@ namespace GestSpace
 			get;
 			set;
 		}
+
+		internal override void AddEvents(List<TileEventViewModel> events)
+		{
+			AddEvents(Up, "Up", events);
+			AddEvents(Center, "Center", events);
+			AddEvents(Right, "Right", events);
+			AddEvents(Left, "Left", events);
+		}
+
+		private void AddEvents(ZoneTransitionViewModel zone, string nameSuffix, List<TileEventViewModel> events)
+		{
+			foreach(var evt in CreateEventsFrom(zone))
+			{
+				evt.Name = nameSuffix + "-" + evt.Name;
+				events.Add(evt);
+			}
+		}
 	}
 }

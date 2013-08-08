@@ -229,9 +229,8 @@ namespace GestSpace
 					if(ViewModel.Debug.FingerCount <= 2 && ViewModel.State == MainViewState.Navigating)
 					{
 						var angle = Helper.RadianToDegree(Math.Atan2(o.Move.y, o.Move.x));
-						var selected = ViewModel.SelectTile(angle);
-						if(selected != null)
-							ViewModel.ShowConfig = false;
+						if(!ViewModel.ShowConfig)
+							ViewModel.SelectTile(angle);
 					}
 				});
 

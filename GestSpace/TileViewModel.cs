@@ -226,6 +226,23 @@ namespace GestSpace
 		}
 
 
+		private List<TileEventViewModel> _Events;
+		public List<TileEventViewModel> Events
+		{
+			get
+			{
+				return _Events;
+			}
+			set
+			{
+				if(value != _Events)
+				{
+					_Events = value;
+					OnPropertyChanged(() => this.Events);
+				}
+			}
+		}
+
 		private PresenterViewModel _Presenter;
 		public PresenterViewModel Presenter
 		{
@@ -238,11 +255,56 @@ namespace GestSpace
 				if(value != _Presenter)
 				{
 					_Presenter = value;
+					UpdateEvents();
 					UpdateListener();
 					OnPropertyChanged(() => this.IsUnused);
 					OnPropertyChanged(() => this.Presenter);
 				}
 			}
+		}
+
+		private TileEventViewModel _SelectedEvent;
+		public TileEventViewModel SelectedEvent
+		{
+			get
+			{
+				return _SelectedEvent;
+			}
+			set
+			{
+				if(value != _SelectedEvent)
+				{
+					_SelectedEvent = value;
+					OnPropertyChanged(() => this.SelectedEvent);
+				}
+			}
+		}
+
+		private bool _HasEvents;
+		public bool HasEvents
+		{
+			get
+			{
+				return _HasEvents;
+			}
+			set
+			{
+				if(value != _HasEvents)
+				{
+					_HasEvents = value;
+					OnPropertyChanged(() => this.HasEvents);
+				}
+			}
+		}
+
+		private void UpdateEvents()
+		{
+			var events = new List<TileEventViewModel>();
+			if(Presenter != null)
+				Presenter.AddEvents(events);
+			Events = events;
+			SelectedEvent = Events.FirstOrDefault();
+			HasEvents = Events.Count != 0;
 		}
 
 		internal void IsLockedChanged()

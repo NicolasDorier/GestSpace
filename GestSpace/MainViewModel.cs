@@ -3,6 +3,7 @@ using NicolasDorier.UI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -406,6 +407,7 @@ namespace GestSpace
 				if(value != _CurrentTile)
 				{
 					_CurrentTile = value;
+					ShowConfig = false;
 					OnPropertyChanged(() => this.CurrentTile);
 				}
 			}
@@ -435,8 +437,12 @@ namespace GestSpace
 		{
 			var tile = Tiles.FirstOrDefault(t => t.Position == point);
 			if(tile != null && !tile.IsUnused)
+			{
 				CurrentTile = tile;
-			return tile;
+				return tile;
+			}
+			else
+				return null;
 		}
 
 		private bool _ShowConfig;

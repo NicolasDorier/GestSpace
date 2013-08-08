@@ -109,6 +109,7 @@
       <DependentUpon>TileConfigView.xaml</DependentUpon>
     </Compile>
     <Compile Include="TileConfigViewModelMock.cs" />
+    <Compile Include="TileEventViewModel.cs" />
     <Compile Include="TileView.xaml.cs">
       <DependentUpon>TileView.xaml</DependentUpon>
     </Compile>
