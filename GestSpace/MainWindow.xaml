@@ -19,6 +19,40 @@
             </UniformGrid>
         </Border>
 
+
+
+        <controls:Hex x:Name="hex" 
+                  Background="{StaticResource BackgroundBrush}"
+                  BorderBrush="{StaticResource LightForegroundBrush}"
+                  Foreground="{StaticResource NormalForegroundBrush}"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center" Visibility="Collapsed"
+                  Margin="0,0,0,15"
+                  Width="200" Height="174">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <TextBlock 
+                           Margin="0,20,0,0"
+                               HorizontalAlignment="Center"
+                               FontWeight="SemiBold"
+                               FontSize="30"
+                               VerticalAlignment="Top"
+                               Text="Circle"></TextBlock>
+                <controls:AutoArrangeGrid Grid.Row="1" HorizontalAlignment="Center">
+                    <controls:AutoArrangeGrid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </controls:AutoArrangeGrid.ColumnDefinitions>
+                    <TextBlock Text="Speed:"
+                               FontWeight="SemiBold" Margin="0,0,10,0"></TextBlock>
+                    <TextBlock Text="300 ms"></TextBlock>
+                </controls:AutoArrangeGrid>
+            </Grid>
+        </controls:Hex>
+
         <ListBox x:Name="list" 
                  ItemsSource="{Binding Tiles}" 
                  SelectedItem="{Binding CurrentTile, Mode=TwoWay}">
@@ -59,7 +93,7 @@
             Margin="0,0,500,0"
             DataContext="{Binding CurrentTile}"></local:TileConfigView>-->
 
-        <TextBlock x:Name="center" Text="" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+        <TextBlock x:Name="center" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"></TextBlock>
 
     </Grid>
 </Window>

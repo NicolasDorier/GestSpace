@@ -38,7 +38,10 @@ namespace GestSpace
 				if(value != _Main)
 				{
 					_Main = value;
-					_SelectedPresenterTemplate = _Main.PresenterTemplates.First();
+					if(_SelectedPresenterTemplate == null)
+						_SelectedPresenterTemplate = _Main.PresenterTemplates.First();
+					if(_SelectedGestureTemplate == null)
+						_SelectedGestureTemplate = _Main.GestureTemplates.First();
 					OnPropertyChanged(() => this.Main);
 				}
 			}
@@ -94,6 +97,42 @@ namespace GestSpace
 				}
 			}
 		}
+
+		private GestureTemplateViewModel _SelectedGestureTemplate;
+		public GestureTemplateViewModel SelectedGestureTemplate
+		{
+			get
+			{
+				return _SelectedGestureTemplate;
+			}
+			set
+			{
+				if(value != _SelectedGestureTemplate)
+				{
+					_SelectedGestureTemplate = value;
+					Gesture = _SelectedGestureTemplate.CreateGesture();
+					OnPropertyChanged(() => this.SelectedGestureTemplate);
+				}
+			}
+		}
+
+		private GestureViewModel _Gesture;
+		public GestureViewModel Gesture
+		{
+			get
+			{
+				return _Gesture;
+			}
+			set
+			{
+				if(value != _Gesture)
+				{
+					_Gesture = value;
+					OnPropertyChanged(() => this.Gesture);
+				}
+			}
+		}
+
 		private Point _Position;
 		public Point Position
 		{
@@ -189,7 +228,7 @@ namespace GestSpace
 			return null;
 		}
 
-	
+
 
 		private string _Description;
 		public string Description

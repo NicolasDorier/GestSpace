@@ -299,7 +299,7 @@
                             <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                             <!--<TextBlock Text="Shor"></TextBlock>
                 <TextBox></TextBox>-->
-                            <TextBlock Text="Template"></TextBlock>
+                            <TextBlock Text="Type"></TextBlock>
 
                             <ComboBox ItemsSource="{Binding Main.PresenterTemplates}"
                           SelectedItem="{Binding SelectedPresenterTemplate, Mode=TwoWay}" >
@@ -323,6 +323,10 @@
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
+                            <TextBlock Text="Fast Gesture"></TextBlock>
+                            <ComboBox ItemsSource="{Binding Main.GestureTemplates}"
+                                      DisplayMemberPath="Name"
+                                      SelectedItem="{Binding SelectedGestureTemplate, Mode=TwoWay}" ></ComboBox>
                         </controls:AutoArrangeGrid>
                     </DockPanel>
                 </TabItem>
@@ -351,6 +355,24 @@
                                      Height="100"
                                      IsEnabled="{Binding CanModifyScript}" 
                                      Text="{Binding SelectedEvent.Command.Script, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                        <Ellipse Grid.Row="1"
+                                 Grid.Column="1"
+                                 Visibility="{Binding SelectedEvent.Command.HasException, Converter={StaticResource BooleanToVisibility}}"
+                                DockPanel.Dock="Right" 
+                                HorizontalAlignment="Right"
+                                 VerticalAlignment="Top"
+                                Margin="10"
+                                Width="10" Height="10">
+                            <Ellipse.Fill>
+                                <LinearGradientBrush>
+                                    <GradientStop Color="#11FF1111" Offset="0" />
+                                    <GradientStop Color="#FFFF0000" Offset="1" />
+                                </LinearGradientBrush>
+                            </Ellipse.Fill>
+                            <Ellipse.ToolTip>
+                                <ToolTip Content="{Binding SelectedEvent.Command.Exception.Message}"></ToolTip>
+                            </Ellipse.ToolTip>
+                        </Ellipse>
                     </Grid>
                 </TabItem>
             </TabControl>

@@ -36,7 +36,7 @@ namespace GestSpace
 			Exception = null;
 			try
 			{
-				_ParsedCommands = interpreterViewModel._Interpreter.Parse(Script);
+				_ParsedCommands = interpreterViewModel._Interpreter.Parse(Script).ToList();
 			}
 			catch(InterpreterException ex)
 			{
@@ -57,7 +57,17 @@ namespace GestSpace
 				{
 					_Exception = value;
 					OnPropertyChanged(() => this.Exception);
+					OnPropertyChanged(() => this.HasException);
 				}
+			}
+		}
+
+		
+		public bool HasException
+		{
+			get
+			{
+				return _Exception != null;
 			}
 		}
 

@@ -52,6 +52,11 @@ namespace GestSpace
 			return (int)v.x + "," + (int)v.y + "," + (int)v.z;
 		}
 
+		public static string NiceToString(this Leap.Vector v, int decimals)
+		{
+			return Math.Round(v.x,decimals) + ", "  + Math.Round(v.y,decimals) + ", " + Math.Round(v.z,decimals);
+		}
+
 		public static double RadianToDegree(double angle)
 		{
 			return angle * (180.0 / Math.PI);

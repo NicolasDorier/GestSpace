@@ -88,6 +88,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CircleGestureViewModel.cs" />
+    <Compile Include="FuzzyCollection.cs" />
+    <Compile Include="GestureTemplateViewModel.cs" />
+    <Compile Include="GestureViewModel.cs" />
     <Compile Include="PresenterTemplateViewModel.cs" />
     <Compile Include="AnonymousComparer.cs" />
     <Compile Include="ClickPresenterView.xaml.cs">

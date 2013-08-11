@@ -157,7 +157,7 @@ namespace GestSpace
 			if(ViewModel.CurrentTile != null)
 				ViewModel.CurrentTile.UpdateListener();
 			var animation = CreateDoubleAnimation(0.0, new Duration(TimeSpan.FromSeconds(0.5)));
-			this.BeginAnimation(OpacityProperty, animation);
+			list.BeginAnimation(OpacityProperty, animation);
 		}
 		private void Maximize()
 		{
@@ -169,7 +169,7 @@ namespace GestSpace
 			if(ViewModel.CurrentTile != null)
 				ViewModel.CurrentTile.UpdateListener();
 			var animation = CreateDoubleAnimation(1.0, new Duration(TimeSpan.FromSeconds(0.5)));
-			this.BeginAnimation(OpacityProperty, animation);
+			list.BeginAnimation(OpacityProperty, animation);
 		}
 
 		ReactiveListener listener;
@@ -237,8 +237,11 @@ namespace GestSpace
 
 
 
-			Maximize();
-			Center();
+			Dispatcher.BeginInvoke(new Action(() =>
+			{
+				Maximize();
+				Center();
+			}));
 		}
 
 		private int? GetAngle(Finger f)
@@ -311,11 +314,7 @@ namespace GestSpace
 			return animation;
 		}
 
-		private void Hex_MouseDown(object sender, MouseButtonEventArgs e)
-		{
-			//Center((Hex)sender);
-		}
-
+		
 		private void Window_KeyDown(object sender, KeyEventArgs e)
 		{
 			if(e.Key == Key.Escape)

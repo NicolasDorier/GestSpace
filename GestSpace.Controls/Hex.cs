@@ -51,7 +51,6 @@ namespace GestSpace.Controls
 			DefaultStyleKeyProperty.OverrideMetadata(typeof(Hex), new FrameworkPropertyMetadata(typeof(Hex)));
 		}
 
-
 		public override void OnApplyTemplate()
 		{
 			Polygon polygon = (Polygon)GetTemplateChild("polygon_PART");

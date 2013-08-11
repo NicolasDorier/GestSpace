@@ -19,7 +19,7 @@ namespace GestSpace
 			Frames = NewFrameDetected;
 			Gestures = Frames
 							.SelectMany(f => f.Gestures())
-							.GroupByUntil(g => g, gr => gr.Any(g => g.State == Gesture.GestureState.STATESTOP), AnonymousComparer.Create((Gesture g) => g.Id));
+							.GroupByUntil(g => g, gr => gr.Where(g => g.State == Gesture.GestureState.STATESTOP).Take(1), AnonymousComparer.Create((Gesture g) => g.Id));
 			FingersMoves = Frames
 							.SelectMany(f => f.Fingers)
 							.GroupByUntil(f => f, f => f.OnlyTimeout(TimeSpan.FromMilliseconds(300)), AnonymousComparer.Create((Finger g) => g.Id));

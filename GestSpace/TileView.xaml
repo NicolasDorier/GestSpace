@@ -10,7 +10,7 @@
              >
     <controls:Hex x:Name="hex" 
                   Background="{StaticResource BackgroundBrush}"
-                  BorderBrush="{StaticResource LightForegroundBrush}"
+                  BorderBrush="{DynamicResource LightForegroundBrush}"
                   Foreground="{StaticResource NormalForegroundBrush}"
                   Width="200">
         <VisualStateManager.VisualStateGroups>

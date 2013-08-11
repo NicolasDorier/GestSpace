@@ -16,6 +16,12 @@ namespace GestSpace
 			set;
 		}
 
+		public Action<string[]> ValidateParameters
+		{
+			get;
+			set;
+		}
+
 		public Action<string[]> Do
 		{
 			get;
@@ -194,27 +200,33 @@ namespace GestSpace
 				{
 					InputSimulator.SimulateKeyPress(arg);
 				}
-			});
+			}, ValidateAllKeys);
 			AddCommandBinding("UP", (args) =>
 			{
 				foreach(var arg in args.Select(a => ToVK(a)).ToList())
 				{
 					InputSimulator.SimulateKeyUp(arg);
 				}
-			});
+			}, ValidateAllKeys);
 			AddCommandBinding("DOWN", (args) =>
 			{
 				foreach(var arg in args.Select(a => ToVK(a)).ToList())
 				{
 					InputSimulator.SimulateKeyDown(arg);
 				}
-			});
+			}, ValidateAllKeys);
+		}
+
+		private void ValidateAllKeys(string[] args)
+		{
+			args.Select(a => ToVK(a)).ToList();
 		}
 
 		Dictionary<string, VirtualKeyCode> _Aliases =
 			new object[][]
 			{
-				new Object[]{"alt", VirtualKeyCode.MENU}
+				new Object[]{"alt", VirtualKeyCode.MENU},
+				new Object[]{"win", VirtualKeyCode.LWIN}
 			}.ToDictionary(o => (string)o[0], o => (VirtualKeyCode)o[1]);
 
 		private VirtualKeyCode ToVK(string key)
@@ -225,15 +237,22 @@ namespace GestSpace
 			if(_Aliases.TryGetValue(key.ToLowerInvariant(), out result))
 				return result;
 
-			throw new InterpreterException(key + " is not a valid parameter");
+			FuzzyCollection<string> acceptedValues = new FuzzyCollection<string>(Metrics.LevenshteinDistance);
+			foreach(var val in Enum.GetNames(typeof(VirtualKeyCode)).Concat(_Aliases.Select(kv => kv.Key)).Select(a => a.ToUpperInvariant()))
+			{
+				acceptedValues.Add(val);
+			}
+			var closest = acceptedValues.GetClosest(key.ToUpperInvariant()).First();
+			throw new InterpreterException(key + " is not a valid parameter, do you mean " + closest.Value + " ?");
 		}
 
-		void AddCommandBinding(string commandType, Action<string[]> run)
+		void AddCommandBinding(string commandType, Action<string[]> run, Action<string[]> validateParameters)
 		{
 			CommandBindings.Add(new CommandBinding()
 			{
 				CommandType = commandType,
-				Do = run
+				Do = run,
+				ValidateParameters = validateParameters
 			});
 		}
 
@@ -275,7 +294,12 @@ namespace GestSpace
 			while(reader.Read())
 			{
 				if(reader.CurrentToken == Token.EOF && command != null)
+				{
+					var binding = Find(command.CommandType);
+					if(binding.ValidateParameters != null)
+						binding.ValidateParameters(command.Parameters.ToArray());
 					yield return command;
+				}
 				if(reader.CurrentToken == Token.Command)
 				{
 					var binding = Find((string)reader.Value);

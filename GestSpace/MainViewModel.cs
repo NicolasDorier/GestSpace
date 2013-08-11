@@ -104,17 +104,22 @@ namespace GestSpace
 			this._Tiles.CollectionChanged += UpdateFreeTiles;
 			Subscribe(spaceListener);
 
+			_GestureTemplates.Add(GestureTemplateViewModel.Empty);
+			_GestureTemplates.Add(new GestureTemplateViewModel<CircleGestureViewModel>()
+			{
+				Name = "Circle"
+			});
 
 			_PresenterTemplates.Add(new PresenterTemplateViewModel("Not used", "", () => PresenterViewModel.Unused));
 			_PresenterTemplates.Add(new PresenterTemplateViewModel("Switch windows", () => new MovePresenterViewModel()
 				{
-					OnEnter = Interpreter.Simulate("DOWN LWIN"),
+					OnEnter = Interpreter.Simulate("DOWN ALT"),
 					OnMoveUp = Interpreter.Simulate("PRESS TAB"),
 					OnMoveDown = Interpreter.Simulate(
 											"DOWN SHIFT",
 											"PRESS TAB",
 											"UP SHIFT"),
-					OnRelease = Interpreter.Simulate("UP LWIN")
+					OnRelease = Interpreter.Simulate("UP ALT")
 				}
 			));
 			_PresenterTemplates.Add(new PresenterTemplateViewModel("Volume", () => VolumePresenterViewModel.Create()));
@@ -169,12 +174,12 @@ namespace GestSpace
 							"DOWN ALT,F4",
 							"UP ALT,F4")
 			}));
-			//_Tiles.Add(new TileViewModel()
-			//{
-			//	Position = new Point(0, 1),
-			//	Action = KeyboardActionViewModel.CreateSwitchWindow(),
-			//	Description = "Switch windows"
-			//});
+			_Tiles.Add(new TileViewModel()
+			{
+				Position = new Point(0, 1),
+				SelectedGestureTemplate = GestureTemplates[1],
+				SelectedPresenterTemplate = PresenterTemplates[1]
+			});
 			//_Tiles.Add(new TileViewModel()
 			//{
 			//	Position = new Point(1, 0),
@@ -342,21 +347,48 @@ namespace GestSpace
 
 		private void RemoveOccupiedUnused()
 		{
-			var unuseds = _Tiles
-				.Select(t => new
-				{
-					Original = t,
-					Duplicates = _Tiles
-						.Where(t2 => t2.IsUnused)
-						.Where(t2 => t != t2 && t.Position == t2.Position)
-				})
-				.SelectMany(d => d.Duplicates).ToList();
+			var stacks = _Tiles
+				.GroupBy(t=>t.Position);
+				
 
-			foreach(var unused in unuseds)
+			foreach(var stack in stacks)
 			{
-				_Tiles.Remove(unused);
+				var usedTile = stack.FirstOrDefault(t => !t.IsUnused);
+				if(usedTile == null)
+					usedTile = stack.FirstOrDefault();
+				foreach(var tile in stack.Where(t=>t != usedTile))
+				{
+					_Tiles.Remove(tile);
+				}
 			}
 
+		}
+
+		private GestureViewModel _LastGesture;
+		public GestureViewModel LastGesture
+		{
+			get
+			{
+				return _LastGesture;
+			}
+			set
+			{
+
+				_LastGesture = null;
+				OnPropertyChanged(() => this.LastGesture);
+				_LastGesture = value;
+				OnPropertyChanged(() => this.LastGesture);
+			}
+		}
+
+
+		private readonly ObservableCollection<GestureTemplateViewModel> _GestureTemplates = new ObservableCollection<GestureTemplateViewModel>();
+		public ObservableCollection<GestureTemplateViewModel> GestureTemplates
+		{
+			get
+			{
+				return _GestureTemplates;
+			}
 		}
 
 		private readonly ObservableCollection<PresenterTemplateViewModel> _PresenterTemplates = new ObservableCollection<PresenterTemplateViewModel>();
@@ -474,12 +506,56 @@ namespace GestSpace
 			{
 				if(value != _State)
 				{
+					var old = _State;
 					_State = value;
 					if(CurrentTile != null)
 						CurrentTile.IsLockedChanged();
+
+					if(old == MainViewState.Minimized)
+						ListenerGestures(false);
+					else if(value == MainViewState.Minimized)
+						ListenerGestures(true);
 					OnPropertyChanged(() => this.State);
 				}
 			}
+		}
+
+		CompositeDisposable _GesturesListeners = null;
+		private void ListenerGestures(bool listen)
+		{
+			if(listen && _GesturesListeners == null)
+			{
+				_GesturesListeners = new CompositeDisposable();
+
+				var gestures = Tiles.Where(t => !t.IsUnused && t.Gesture != null).Select(t => t.Gesture);
+				foreach(var gesture in gestures)
+				{
+					_GesturesListeners.Add(gesture.Subscribe(SpaceListener));
+				}
+
+				_GesturesListeners.Add(SubscribeToGestures(gestures.Select(g => g.GestureMatches)));
+
+			}
+			if(!listen && _GesturesListeners != null)
+			{
+				_GesturesListeners.Dispose();
+				_GesturesListeners = null;
+			}
+		}
+
+		private IDisposable SubscribeToGestures(IEnumerable<IObservable<GestureMatch>> matches)
+		{
+			return matches.Merge()
+				   .ObserveOn(UI)
+				   .Subscribe(g =>
+				   {
+					   var tile = Tiles.FirstOrDefault(t => t.Gesture == g.Sender);
+					   if(tile != null)
+					   {
+						   CurrentTile = tile;
+						   State = MainViewState.Navigating;
+					   }
+				   });
 		}
 	}
 }
