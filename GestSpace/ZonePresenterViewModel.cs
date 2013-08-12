@@ -6,22 +6,22 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace GestSpace
 {
 	public class ZoneTransitionViewModel : NotifyPropertyChangedBase
 	{
-		public Action OnLeave
-		{
-			get;
-			set;
-		}
 		public Action OnEnter
 		{
 			get;
 			set;
 		}
-
+		public Action OnLeave
+		{
+			get;
+			set;
+		}
 		private bool _Activated;
 		public bool Activated
 		{
@@ -131,6 +131,9 @@ namespace GestSpace
 			Current = zone;
 		}
 
+
+
+
 		private ZoneTransitionViewModel _Current;
 		public ZoneTransitionViewModel Current
 		{
@@ -190,6 +193,7 @@ namespace GestSpace
 		internal override void AddEvents(List<TileEventViewModel> events)
 		{
 			AddEvents(Up, "Up", events);
+			AddEvents(Down, "Down", events);
 			AddEvents(Center, "Center", events);
 			AddEvents(Right, "Right", events);
 			AddEvents(Left, "Left", events);

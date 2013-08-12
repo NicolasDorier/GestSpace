@@ -323,12 +323,19 @@
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
-                            <TextBlock Text="Fast Gesture"></TextBlock>
+                            <TextBlock Text="Go to:"></TextBlock>
+                            <TextBlock Text=""></TextBlock>
+                            <TextBlock Text="When gesture"></TextBlock>
                             <ComboBox ItemsSource="{Binding Main.GestureTemplates}"
                                       DisplayMemberPath="Name"
                                       SelectedItem="{Binding SelectedGestureTemplate, Mode=TwoWay}" ></ComboBox>
-                            <TextBlock Text="Fast Context"></TextBlock>
+                            <TextBlock Text="When program"></TextBlock>
                             <TextBox Text="{Binding FastContext, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                            <TextBlock Text=""></TextBlock>
+                            <StackPanel Orientation="Horizontal" Margin="10,-20,0,0">
+                                <TextBlock Text="Current program is "></TextBlock>
+                                <controls:HyperlinkButton Text="{Binding Main.CurrentProgram}" Command="{Binding SetToCurrentProgram}" Margin="0,-11,0,0"></controls:HyperlinkButton>
+                            </StackPanel>
                         </controls:AutoArrangeGrid>
                     </DockPanel>
                 </TabItem>
@@ -339,6 +346,7 @@
                             <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
                             <RowDefinition></RowDefinition>
                         </Grid.RowDefinitions>
@@ -375,6 +383,14 @@
                                 <ToolTip Content="{Binding SelectedEvent.Command.Exception.Message}"></ToolTip>
                             </Ellipse.ToolTip>
                         </Ellipse>
+                        <controls:HyperlinkButton 
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Margin="0,-10,0,0"
+                            HorizontalAlignment="Right"
+                            Command="{Binding ClearAllEvents}"
+                            Text="Clear all events"
+                            ></controls:HyperlinkButton>
                     </Grid>
                 </TabItem>
             </TabControl>

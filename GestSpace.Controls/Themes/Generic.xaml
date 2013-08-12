@@ -3,6 +3,38 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:GestSpace.Controls">
 
+    <Style TargetType="{x:Type local:HyperlinkButton}">
+        <Setter Property="Foreground"
+                Value="Blue"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:HyperlinkButton}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" Padding="2">
+                        <TextBlock><Hyperlink x:Name="link" ToolTip="{TemplateBinding ToolTip}"  IsEnabled="{TemplateBinding IsEnabled}"><Run x:Name="run"></Run></Hyperlink></TextBlock>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver"
+                     Value="true">
+                <Setter Property="Foreground"
+                        Value="Red"/>
+            </Trigger>
+            <Trigger Property="IsEnabled"
+                     Value="false">
+                <Setter Property="Foreground"
+                        Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled"
+                     Value="true">
+                <Setter Property="Cursor"
+                        Value="Hand"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 
     <Style TargetType="{x:Type local:Hex}">
         <Setter Property="BorderThickness" Value="3"></Setter>

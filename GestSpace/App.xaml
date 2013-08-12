@@ -1,6 +1,7 @@
 ﻿<Application x:Class="GestSpace.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:GestSpace.Controls;assembly=GestSpace.Controls"
              xmlns:local="clr-namespace:GestSpace"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
@@ -18,6 +19,12 @@
 
 
         <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="13"></Setter>
+            <Setter Property="Foreground" Value="{DynamicResource NormalForegroundBrush}"></Setter>
+            <Setter Property="VerticalAlignment" Value="Center"></Setter>
+        </Style>
+
+        <Style TargetType="{x:Type controls:HyperlinkButton}">
             <Setter Property="FontSize" Value="13"></Setter>
             <Setter Property="Foreground" Value="{DynamicResource NormalForegroundBrush}"></Setter>
             <Setter Property="VerticalAlignment" Value="Center"></Setter>

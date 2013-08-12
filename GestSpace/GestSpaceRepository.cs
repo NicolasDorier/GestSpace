@@ -74,6 +74,12 @@ namespace GestSpace
 				get;
 				set;
 			}
+			[DataMember]
+			public string Program
+			{
+				get;
+				set;
+			}
 		}
 		[DataContract]
 		public class GestSpaceData
@@ -115,7 +121,7 @@ namespace GestSpace
 			{
 				var tileVm = new TileViewModel();
 				tileVm.Position = new System.Windows.Point(tile.X, tile.Y);
-				viewModel.Tiles.Add(tileVm);
+				tileVm.Main = viewModel;
 				if(tile.ForcedName != null)
 				{
 					tileVm.Description = tile.ForcedName;
@@ -124,6 +130,8 @@ namespace GestSpace
 													.FirstOrDefault(g => g.Name.Equals(tile.GestureTemplate, StringComparison.InvariantCultureIgnoreCase));
 				tileVm.SelectedPresenterTemplate = viewModel.PresenterTemplates
 													.FirstOrDefault(g => g.Description.Equals(tile.PresenterTemplate, StringComparison.InvariantCultureIgnoreCase));
+
+				tileVm.FastContext = tile.Program;
 				foreach(var evt in tile.Events)
 				{
 					var evtVm =
@@ -132,6 +140,7 @@ namespace GestSpace
 					if(evtVm != null)
 						evtVm.Command.Script = evt.Command;
 				}
+				viewModel.Tiles.Add(tileVm);
 			}
 			viewModel.SelectTile(new System.Windows.Point(spaceData.LastX, spaceData.LastY));
 		}
@@ -155,6 +164,8 @@ namespace GestSpace
 					tile.PresenterTemplate = tileVm.SelectedPresenterTemplate.Description;
 				if(tileVm.SelectedGestureTemplate != null)
 					tile.GestureTemplate = tileVm.SelectedGestureTemplate.Name;
+
+				tile.Program = tileVm.FastContext;
 				foreach(var evtVm in tileVm.Events)
 				{
 					var evt = new EventData();

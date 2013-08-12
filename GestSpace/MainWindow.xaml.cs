@@ -160,6 +160,7 @@ namespace GestSpace
 				return;
 			_Maximized = true;
 			WindowState = System.Windows.WindowState.Maximized;
+			Topmost = false;
 			Topmost = true;
 			if(ViewModel.CurrentTile != null)
 				ViewModel.CurrentTile.UpdateListener();
@@ -244,7 +245,6 @@ namespace GestSpace
 
 				Dispatcher.BeginInvoke(new Action(() =>
 				{
-					Maximize();
 					Center();
 				}));
 			}));

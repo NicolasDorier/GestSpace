@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace GestSpace
 {
@@ -75,6 +76,21 @@ namespace GestSpace
 			}
 		}
 
+		private ICommand _SetToCurrentProgram;
+		public ICommand SetToCurrentProgram
+		{
+			get
+			{
+				if(_SetToCurrentProgram == null)
+				{
+					_SetToCurrentProgram = new DelegateCommand(o =>
+					{
+						FastContext = Main.CurrentProgram;
+					}, o => true);
+				}
+				return _SetToCurrentProgram;
+			}
+		}
 		private PresenterTemplateViewModel _SelectedPresenterTemplate;
 		public PresenterTemplateViewModel SelectedPresenterTemplate
 		{
@@ -123,6 +139,27 @@ namespace GestSpace
 						Gesture = null;
 					OnPropertyChanged(() => this.SelectedGestureTemplate);
 				}
+			}
+		}
+
+
+		ICommand _ClearAllEvents;
+		public ICommand ClearAllEvents
+		{
+			get
+			{
+				if(_ClearAllEvents == null)
+				{
+					_ClearAllEvents = new DelegateCommand(o =>
+					{
+						foreach(var evt in Events)
+						{
+							if(evt.CanModifyScript)
+								evt.Command.Script = "";
+						}
+					}, o => true);
+				}
+				return _ClearAllEvents;
 			}
 		}
 

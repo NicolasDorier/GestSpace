@@ -97,7 +97,7 @@ namespace GestSpace
 	{
 		InterpreterViewModel Interpreter = new InterpreterViewModel(new Interpreter());
 		ForegroundProgramListener _ProgListener;
-
+		int _CurrentPid = Process.GetCurrentProcess().Id;
 		public MainViewModel(ReactiveSpace spaceListener)
 		{
 			_ProgListener = new ForegroundProgramListener();
@@ -106,11 +106,15 @@ namespace GestSpace
 						.ObserveOn(UI)
 						.Subscribe(pid =>
 						{
-							using(var p = Process.GetProcessById(pid))
+							if(pid != _CurrentPid)
 							{
-								var tile = Tiles.FirstOrDefault(t => t.FastContext == p.ProcessName);
-								if(tile != null)
-									CurrentTile = tile;
+								using(var p = Process.GetProcessById(pid))
+								{
+									CurrentProgram = p.ProcessName;
+									var tile = Tiles.FirstOrDefault(t => t.FastContext == p.ProcessName);
+									if(tile != null)
+										CurrentTile = tile;
+								}
 							}
 						});
 
@@ -161,6 +165,7 @@ namespace GestSpace
 					Down = new ZoneTransitionViewModel()
 					{
 						OnEnter = Interpreter.Simulate("PRESS WIN,DOWN"),
+						OnLeave = Interpreter.Simulate("")
 					},
 					Right = new ZoneTransitionViewModel()
 					{
@@ -172,7 +177,7 @@ namespace GestSpace
 						OnEnter = Interpreter.Simulate("PRESS WIN,LEFT"),
 						OnLeave = Interpreter.Simulate("PRESS WIN,RIGHT"),
 					},
-					Center = new ZoneTransitionViewModel()
+					Center = new ZoneTransitionViewModel(),
 
 				}));
 			_PresenterTemplates.Add(new PresenterTemplateViewModel("Close window", () => new ClickPresenterViewModel()
@@ -552,6 +557,24 @@ namespace GestSpace
 						   State = MainViewState.Navigating;
 					   }
 				   });
+		}
+
+		
+		private string _CurrentProgram;
+		public string CurrentProgram
+		{
+			get
+			{
+				return _CurrentProgram;
+			}
+			set
+			{
+				if(value != _CurrentProgram)
+				{
+					_CurrentProgram = value;
+					OnPropertyChanged(() => this.CurrentProgram);
+				}
+			}
 		}
 	}
 }

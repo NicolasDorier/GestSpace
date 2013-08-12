@@ -240,6 +240,8 @@ namespace GestSpace
 									new Object[]{"alt", VirtualKeyCode.MENU},
 									new Object[]{"win", VirtualKeyCode.LWIN},
 									new Object[]{"ctrl", VirtualKeyCode.CONTROL},
+									new Object[]{"pageup", VirtualKeyCode.PRIOR},
+									new Object[]{"pagedown", VirtualKeyCode.NEXT},
 								}.ToDictionary(o => (string)o[0], o => (VirtualKeyCode)o[1]);
 					foreach(var val in Enum.GetNames(typeof(VirtualKeyCode)))
 					{

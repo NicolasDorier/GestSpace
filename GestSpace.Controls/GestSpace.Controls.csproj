@@ -51,6 +51,7 @@
     <Compile Include="ControlAdorner.cs" />
     <Compile Include="Hex.cs" />
     <Compile Include="HexCanvas.cs" />
+    <Compile Include="HyperlinkButton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
