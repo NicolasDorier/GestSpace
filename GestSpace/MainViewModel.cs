@@ -96,8 +96,23 @@ namespace GestSpace
 	public class MainViewModel : NotifyPropertyChangedBase
 	{
 		InterpreterViewModel Interpreter = new InterpreterViewModel(new Interpreter());
+		ForegroundProgramListener _ProgListener;
+
 		public MainViewModel(ReactiveSpace spaceListener)
 		{
+			_ProgListener = new ForegroundProgramListener();
+
+			_ProgListener.ForegroundProcess
+						.ObserveOn(UI)
+						.Subscribe(pid =>
+						{
+							using(var p = Process.GetProcessById(pid))
+							{
+								var tile = Tiles.FirstOrDefault(t => t.FastContext == p.ProcessName);
+								if(tile != null)
+									CurrentTile = tile;
+							}
+						});
 
 			this.State = MainViewState.Navigating;
 			this._SpaceListener = spaceListener;
@@ -105,11 +120,24 @@ namespace GestSpace
 			Subscribe(spaceListener);
 
 			_GestureTemplates.Add(GestureTemplateViewModel.Empty);
-			_GestureTemplates.Add(new GestureTemplateViewModel<CircleGestureViewModel>()
+			_GestureTemplates.Add(new LeapGestureTemplateViewModel(Gesture.GestureType.TYPECIRCLE)
 			{
 				Name = "Circle"
 			});
+			_GestureTemplates.Add(new LeapGestureTemplateViewModel(Gesture.GestureType.TYPEKEYTAP)
+			{
+				Name = "KeyTap"
+			});
+			_GestureTemplates.Add(new LeapGestureTemplateViewModel(Gesture.GestureType.TYPESCREENTAP)
+			{
+				Name = "ScreenTap"
+			});
 
+			_GestureTemplates.Add(new LeapGestureTemplateViewModel(Gesture.GestureType.TYPESWIPE)
+			{
+				Name = "Swipe",
+				MinSpeed = 1500
+			});
 			_PresenterTemplates.Add(new PresenterTemplateViewModel("Not used", "", () => PresenterViewModel.Unused));
 			_PresenterTemplates.Add(new PresenterTemplateViewModel("Switch windows", () => new MovePresenterViewModel()
 				{
@@ -127,76 +155,44 @@ namespace GestSpace
 				{
 					Up = new ZoneTransitionViewModel()
 					{
-						OnEnter = Interpreter.Simulate(
-									"DOWN LWIN",
-									"PRESS UP",
-									"UP LWIN"),
-						OnLeave = Interpreter.Simulate(
-									"DOWN LWIN",
-									"PRESS DOWN",
-									"UP LWIN"),
+						OnEnter = Interpreter.Simulate("PRESS WIN,UP"),
+						OnLeave = Interpreter.Simulate("PRESS WIN,DOWN"),
 					},
 					Down = new ZoneTransitionViewModel()
 					{
-						OnEnter = Interpreter.Simulate(
-									"DOWN LWIN",
-									"PRESS DOWN",
-									"UP LWIN"),
+						OnEnter = Interpreter.Simulate("PRESS WIN,DOWN"),
 					},
 					Right = new ZoneTransitionViewModel()
 					{
-						OnEnter = Interpreter.Simulate(
-									"DOWN LWIN",
-									"PRESS RIGHT",
-									"UP LWIN"),
-						OnLeave = Interpreter.Simulate(
-									"DOWN LWIN",
-									"PRESS LEFT",
-									"UP LWIN"),
+						OnEnter = Interpreter.Simulate("PRESS WIN,RIGHT"),
+						OnLeave = Interpreter.Simulate("PRESS WIN,LEFT"),
 					},
 					Left = new ZoneTransitionViewModel()
 					{
-						OnEnter = Interpreter.Simulate(
-									"DOWN LWIN",
-									"PRESS LEFT",
-									"UP LWIN"),
-						OnLeave = Interpreter.Simulate(
-									"DOWN LWIN",
-									"PRESS RIGHT",
-									"UP LWIN"),
+						OnEnter = Interpreter.Simulate("PRESS WIN,LEFT"),
+						OnLeave = Interpreter.Simulate("PRESS WIN,RIGHT"),
 					},
 					Center = new ZoneTransitionViewModel()
 
 				}));
 			_PresenterTemplates.Add(new PresenterTemplateViewModel("Close window", () => new ClickPresenterViewModel()
 			{
-				OnClicked = Interpreter.Simulate(
-							"DOWN ALT,F4",
-							"UP ALT,F4")
+				OnClicked = Interpreter.Simulate("PRESS ALT,F4")
 			}));
-			_Tiles.Add(new TileViewModel()
-			{
-				Position = new Point(0, 1),
-				SelectedGestureTemplate = GestureTemplates[1],
-				SelectedPresenterTemplate = PresenterTemplates[1]
-			});
-			//_Tiles.Add(new TileViewModel()
-			//{
-			//	Position = new Point(1, 0),
-			//	Action = new VolumeActionViewModel(),
-			//	Description = "Volume"
-			//});
 
+			_Debug = new DebugViewModel(this);
+			Observable.Interval(TimeSpan.FromSeconds(5.0))
+				.ObserveOn(UI)
+				.Subscribe(t =>
+				{
+					new GestSpaceRepository().Save(this);
+				});
 
-			//SelectTile(new Point(0, 1));
-			this._Debug = new DebugViewModel(this);
-
-			this.Tiles.Add(new TileViewModel()
-			{
-				Presenter = PresenterViewModel.Unused
-			});
-
+			new GestSpaceRepository().Load(this);
+			//CurrentTile = Tiles.First(t => !t.IsUnused);
 		}
+
+
 
 		public readonly SynchronizationContext UI = SynchronizationContext.Current;
 
@@ -355,7 +351,7 @@ namespace GestSpace
 			{
 				var usedTile = stack.FirstOrDefault(t => !t.IsUnused);
 				if(usedTile == null)
-					usedTile = stack.FirstOrDefault();
+					usedTile = stack.LastOrDefault();
 				foreach(var tile in stack.Where(t=>t != usedTile))
 				{
 					_Tiles.Remove(tile);
@@ -465,7 +461,7 @@ namespace GestSpace
 		}
 
 
-		private TileViewModel SelectTile(Point point)
+		public TileViewModel SelectTile(Point point)
 		{
 			var tile = Tiles.FirstOrDefault(t => t.Position == point);
 			if(tile != null && !tile.IsUnused)

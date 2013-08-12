@@ -68,6 +68,16 @@ namespace GestSpace.Interop
 		ExactSpelling = false, CharSet = CharSet.Auto, SetLastError = true)]
 		public static extern bool EnumDesktopWindows(IntPtr hDesktop, EnumDelegate lpEnumCallbackFunction, IntPtr lParam);
 
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+		public static extern IntPtr GetActiveWindow();
+
+		[DllImport("user32.dll")]
+		public static extern IntPtr GetForegroundWindow();
+
+		[DllImport("user32.dll", SetLastError = true)]
+		public static extern void GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
 		
 		public static int CountVisibleWindows()
 		{

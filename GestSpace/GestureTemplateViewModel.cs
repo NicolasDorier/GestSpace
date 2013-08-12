@@ -7,11 +7,25 @@ using System.Threading.Tasks;
 
 namespace GestSpace
 {
-	public class GestureTemplateViewModel<T> : GestureTemplateViewModel where T : GestureViewModel, new()
+	public class LeapGestureTemplateViewModel : GestureTemplateViewModel
 	{
+		Leap.Gesture.GestureType _Type;
+		public LeapGestureTemplateViewModel(Leap.Gesture.GestureType gesture)
+		{
+			_Type = gesture;
+		}
 		public override GestureViewModel CreateGesture()
 		{
-			return new T();
+			return new LeapGestureViewModel(_Type)
+			{
+				MinSpeed = MinSpeed
+			};
+		}
+
+		public double MinSpeed
+		{
+			get;
+			set;
 		}
 	} 
 	public abstract class GestureTemplateViewModel : NotifyPropertyChangedBase

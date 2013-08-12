@@ -39,9 +39,9 @@ namespace GestSpace
 				{
 					_Main = value;
 					if(_SelectedPresenterTemplate == null)
-						_SelectedPresenterTemplate = _Main.PresenterTemplates.First();
+						SelectedPresenterTemplate = _Main.PresenterTemplates.First();
 					if(_SelectedGestureTemplate == null)
-						_SelectedGestureTemplate = _Main.GestureTemplates.First();
+						SelectedGestureTemplate = _Main.GestureTemplates.First();
 					OnPropertyChanged(() => this.Main);
 				}
 			}
@@ -87,11 +87,18 @@ namespace GestSpace
 				if(value != _SelectedPresenterTemplate)
 				{
 					_SelectedPresenterTemplate = value;
-					Presenter = _SelectedPresenterTemplate.CreatePresenter();
-					if(TakeSuggestedName || _SelectedPresenterTemplate.Sample == PresenterViewModel.Unused)
+					if(_SelectedPresenterTemplate != null)
 					{
-						Description = _SelectedPresenterTemplate.SuggestedName;
-						TakeSuggestedName = true;
+						Presenter = _SelectedPresenterTemplate.CreatePresenter();
+						if(TakeSuggestedName || _SelectedPresenterTemplate.Sample == PresenterViewModel.Unused)
+						{
+							Description = _SelectedPresenterTemplate.SuggestedName;
+							TakeSuggestedName = true;
+						}
+					}
+					else
+					{
+						Presenter = null;
 					}
 					OnPropertyChanged(() => this.SelectedPresenterTemplate);
 				}
@@ -110,7 +117,10 @@ namespace GestSpace
 				if(value != _SelectedGestureTemplate)
 				{
 					_SelectedGestureTemplate = value;
-					Gesture = _SelectedGestureTemplate.CreateGesture();
+					if(_SelectedGestureTemplate != null)
+						Gesture = _SelectedGestureTemplate.CreateGesture();
+					else
+						Gesture = null;
 					OnPropertyChanged(() => this.SelectedGestureTemplate);
 				}
 			}
@@ -165,6 +175,10 @@ namespace GestSpace
 				{
 					_IsSelected = value;
 					UpdateListener();
+					Main.UI.Post(new SendOrPostCallback(o =>
+					{
+						OnPropertyChanged(() => this.IsUnused);
+					}),null);
 					OnPropertyChanged(() => this.IsLocked);
 					OnPropertyChanged(() => this.IsSelected);
 				}
@@ -252,7 +266,7 @@ namespace GestSpace
 		{
 			get
 			{
-				return Presenter == PresenterViewModel.Unused;
+				return Presenter == PresenterViewModel.Unused && !IsSelected;
 			}
 		}
 
@@ -270,6 +284,8 @@ namespace GestSpace
 		{
 			get
 			{
+				if(_Events == null)
+					return new List<TileEventViewModel>();
 				return _Events;
 			}
 			set
@@ -349,6 +365,23 @@ namespace GestSpace
 		internal void IsLockedChanged()
 		{
 			OnPropertyChanged(() => IsLocked);
+		}
+
+		private string _FastContext;
+		public string FastContext
+		{
+			get
+			{
+				return _FastContext;
+			}
+			set
+			{
+				if(value != _FastContext)
+				{
+					_FastContext = value;
+					OnPropertyChanged(() => this.FastContext);
+				}
+			}
 		}
 	}
 }

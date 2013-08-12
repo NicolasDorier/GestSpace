@@ -34,12 +34,7 @@ namespace GestSpace
 		{
 			InitializeComponent();
 
-			listener = new ReactiveListener();
-			var spaceListener = new ReactiveSpace(listener);
 
-			controller = new Controller(listener);
-
-			ViewModel = new MainViewModel(spaceListener);
 			root.SetBinding(Grid.DataContextProperty, new Binding()
 			{
 				Source = this,
@@ -175,72 +170,83 @@ namespace GestSpace
 		ReactiveListener listener;
 		void MainWindow_Loaded(object sender, RoutedEventArgs e)
 		{
-			var ui = SynchronizationContext.Current;
-
-			//listener
-			//	.FingersMoves
-			//	.SelectMany(f => f.ToList().Select(l =>
-			//	new
-			//	{
-			//		Key = f.Key,
-			//		Fingers = l
-			//	}))
-			//	.Subscribe(f =>
-			//	{
-			//		Console.WriteLine("finger");
-			//		try
-			//		{
-			//			//var max = f.Fingers.Select(ff => GetAngle(ff)).Where(a => a != null).Select(a => a.Value).Max();
-			//			var av = f.Fingers.Select(ff => GetAngle(ff)).Where(a => a != null).Select(a => a.Value).Average();
-			//			Console.WriteLine("av : " + ((int)av));
-			//		}
-			//		catch
-			//		{
-			//			Console.WriteLine("Ex");
-			//		}
-			//	});
-
-			var centers =
-				listener
-				.FingersMoves
-				.SelectMany(f => f)
-				.Buffer(TimeSpan.FromMilliseconds(200), TimeSpan.FromMilliseconds(100))
-				.Where(b => b.Count > 0)
-				.Select(v => new Leap.Vector(v.Average(m => m.TipPosition.x), v.Average(m => m.TipPosition.y), 0.0f));
-
-
-			listener
-				.FingersMoves
-				.SelectMany(f => f)
-				.Select(v => v.TipPosition)
-				.CombineLatest(centers, ViewModel.SpaceListener.IsLocked, (p, center, locked) => new
-				{
-					Center = center,
-					Position = p.To2D(),
-					Move = p.To2D() - center,
-					Locked = locked
-				})
-				.Where(o => o.Move.Magnitude >= 50.0)
-				.Sample(TimeSpan.FromMilliseconds(500))
-				.Where(p => !p.Locked)
-				.ObserveOn(ui)
-				.Subscribe(o =>
-				{
-					if(ViewModel.Debug.FingerCount <= 2 && ViewModel.State == MainViewState.Navigating)
-					{
-						var angle = Helper.RadianToDegree(Math.Atan2(o.Move.y, o.Move.x));
-						if(!ViewModel.ShowConfig)
-							ViewModel.SelectTile(angle);
-					}
-				});
-
-
-
-
 			Dispatcher.BeginInvoke(new Action(() =>
 			{
-				Maximize();
-				Center();
+
+				listener = new ReactiveListener();
+				var spaceListener = new ReactiveSpace(listener);
+
+				controller = new Controller(listener);
+
+				ViewModel = new MainViewModel(spaceListener);
+
+				var ui = SynchronizationContext.Current;
+
+				//listener
+				//	.FingersMoves
+				//	.SelectMany(f => f.ToList().Select(l =>
+				//	new
+				//	{
+				//		Key = f.Key,
+				//		Fingers = l
+				//	}))
+				//	.Subscribe(f =>
+				//	{
+				//		Console.WriteLine("finger");
+				//		try
+				//		{
+				//			//var max = f.Fingers.Select(ff => GetAngle(ff)).Where(a => a != null).Select(a => a.Value).Max();
+				//			var av = f.Fingers.Select(ff => GetAngle(ff)).Where(a => a != null).Select(a => a.Value).Average();
+				//			Console.WriteLine("av : " + ((int)av));
+				//		}
+				//		catch
+				//		{
+				//			Console.WriteLine("Ex");
+				//		}
+				//	});
+
+				var centers =
+					listener
+					.FingersMoves
+					.SelectMany(f => f)
+					.Buffer(TimeSpan.FromMilliseconds(200), TimeSpan.FromMilliseconds(100))
+					.Where(b => b.Count > 0)
+					.Select(v => new Leap.Vector(v.Average(m => m.TipPosition.x), v.Average(m => m.TipPosition.y), 0.0f));
+
+
+				listener
+					.FingersMoves
+					.SelectMany(f => f)
+					.Select(v => v.TipPosition)
+					.CombineLatest(centers, ViewModel.SpaceListener.IsLocked, (p, center, locked) => new
+					{
+						Center = center,
+						Position = p.To2D(),
+						Move = p.To2D() - center,
+						Locked = locked
+					})
+					.Where(o => o.Move.Magnitude >= 50.0)
+					.Sample(TimeSpan.FromMilliseconds(500))
+					.Where(p => !p.Locked)
+					.ObserveOn(ui)
+					.Subscribe(o =>
+					{
+						if(ViewModel.Debug.FingerCount <= 2 && ViewModel.State == MainViewState.Navigating)
+						{
+							var angle = Helper.RadianToDegree(Math.Atan2(o.Move.y, o.Move.x));
+							if(!ViewModel.ShowConfig)
+								ViewModel.SelectTile(angle);
+						}
+					});
+
+
+
+
+				Dispatcher.BeginInvoke(new Action(() =>
+				{
+					Maximize();
+					Center();
+				}));
 			}));
 		}
 
@@ -314,7 +320,7 @@ namespace GestSpace
 			return animation;
 		}
 
-		
+
 		private void Window_KeyDown(object sender, KeyEventArgs e)
 		{
 			if(e.Key == Key.Escape)

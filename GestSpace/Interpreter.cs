@@ -196,10 +196,15 @@ namespace GestSpace
 		{
 			AddCommandBinding("PRESS", (args) =>
 			{
-				foreach(var arg in args.Select(a => ToVK(a)).ToList())
-				{
-					InputSimulator.SimulateKeyPress(arg);
-				}
+				var allArgs = args.Select(a => ToVK(a)).ToList();
+				if(allArgs.Count == 1)
+					InputSimulator.SimulateKeyPress(allArgs[0]);
+				else
+					foreach(var a in allArgs)
+						InputSimulator.SimulateKeyDown(a);
+				foreach(var a in allArgs)
+					InputSimulator.SimulateKeyUp(a);
+
 			}, ValidateAllKeys);
 			AddCommandBinding("UP", (args) =>
 			{
@@ -222,23 +227,44 @@ namespace GestSpace
 			args.Select(a => ToVK(a)).ToList();
 		}
 
-		Dictionary<string, VirtualKeyCode> _Aliases =
-			new object[][]
+		Dictionary<string, VirtualKeyCode> _Aliases;
+
+		Dictionary<string, VirtualKeyCode> Aliases
+		{
+			get
 			{
-				new Object[]{"alt", VirtualKeyCode.MENU},
-				new Object[]{"win", VirtualKeyCode.LWIN}
-			}.ToDictionary(o => (string)o[0], o => (VirtualKeyCode)o[1]);
+				if(_Aliases == null)
+				{
+					_Aliases = new object[][]
+								{
+									new Object[]{"alt", VirtualKeyCode.MENU},
+									new Object[]{"win", VirtualKeyCode.LWIN},
+									new Object[]{"ctrl", VirtualKeyCode.CONTROL},
+								}.ToDictionary(o => (string)o[0], o => (VirtualKeyCode)o[1]);
+					foreach(var val in Enum.GetNames(typeof(VirtualKeyCode)))
+					{
+						if(val.StartsWith("VK_"))
+						{
+							var alias = val.Substring(3);
+							_Aliases.Add(alias.ToLowerInvariant(), (VirtualKeyCode)Enum.Parse(typeof(VirtualKeyCode), val));
+						}
+					}
+				}
+				return _Aliases;
+			}
+		}
+
 
 		private VirtualKeyCode ToVK(string key)
 		{
 			VirtualKeyCode result;
 			if(Enum.TryParse<VirtualKeyCode>(key, out result))
 				return result;
-			if(_Aliases.TryGetValue(key.ToLowerInvariant(), out result))
+			if(Aliases.TryGetValue(key.ToLowerInvariant(), out result))
 				return result;
 
 			FuzzyCollection<string> acceptedValues = new FuzzyCollection<string>(Metrics.LevenshteinDistance);
-			foreach(var val in Enum.GetNames(typeof(VirtualKeyCode)).Concat(_Aliases.Select(kv => kv.Key)).Select(a => a.ToUpperInvariant()))
+			foreach(var val in Enum.GetNames(typeof(VirtualKeyCode)).Concat(Aliases.Select(kv => kv.Key)).Select(a => a.ToUpperInvariant()))
 			{
 				acceptedValues.Add(val);
 			}

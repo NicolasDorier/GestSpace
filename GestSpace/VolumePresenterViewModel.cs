@@ -14,6 +14,7 @@ namespace GestSpace
 		{
 			MMDeviceEnumerator devEnum = new MMDeviceEnumerator();
 			MMDevice defaultDevice = devEnum.GetDefaultAudioEndpoint(EDataFlow.eRender, ERole.eMultimedia);
+
 			return new VolumePresenterViewModel(
 					minValue: 0,
 					maxValue: 100,

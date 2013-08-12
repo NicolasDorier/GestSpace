@@ -149,11 +149,12 @@ namespace GestSpace
 							_Current.OnLeave();
 					}
 					_Current = value;
-					if(_Current != null)
+					var current = _Current;
+					if(current != null)
 					{
-						_Current.Activated = true;
-						if(_Current.OnEnter != null)
-							_Current.OnEnter();
+						current.Activated = true;
+						if(current.OnEnter != null)
+							current.OnEnter();
 					}
 					OnPropertyChanged(() => this.Current);
 				}

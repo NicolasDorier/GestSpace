@@ -22,6 +22,6 @@
                 </VisualStateGroup.Transitions>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <Rectangle x:Name="rect" Fill="{StaticResource NormalForegroundBrush}"></Rectangle>
+        <Rectangle x:Name="rect" Fill="{DynamicResource NormalForegroundBrush}"></Rectangle>
     </Grid>
 </UserControl>

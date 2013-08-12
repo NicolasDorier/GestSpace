@@ -327,6 +327,8 @@
                             <ComboBox ItemsSource="{Binding Main.GestureTemplates}"
                                       DisplayMemberPath="Name"
                                       SelectedItem="{Binding SelectedGestureTemplate, Mode=TwoWay}" ></ComboBox>
+                            <TextBlock Text="Fast Context"></TextBlock>
+                            <TextBox Text="{Binding FastContext, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                         </controls:AutoArrangeGrid>
                     </DockPanel>
                 </TabItem>

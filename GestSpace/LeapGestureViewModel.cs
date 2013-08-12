@@ -8,14 +8,19 @@ using System.Threading.Tasks;
 
 namespace GestSpace
 {
-	public class CircleGestureViewModel : GestureViewModel
+	public class LeapGestureViewModel : GestureViewModel
 	{
+		Leap.Gesture.GestureType _Type;
+		public LeapGestureViewModel(Leap.Gesture.GestureType gestureType)
+		{
+			_Type = gestureType;
+		}
 		public override IDisposable Subscribe(ReactiveSpace space)
 		{
 			return space
 					.ReactiveListener
 					.Gestures
-					.Where(g => g.Key.Type == Leap.Gesture.GestureType.TYPECIRCLE)
+					.Where(g => g.Key.Type == _Type)
 					.SelectMany(g => g.ToList().Select(l => new
 					{
 						Key = g.Key,
@@ -26,24 +31,29 @@ namespace GestSpace
 					.Subscribe(gs =>
 					{
 						var g = gs[0];
+
+						float speed = g.Gestures.Where(gg => gg.Pointables.Count > 0)
+										.Average(gg => gg.Pointables[0].TipVelocity.Magnitude);
+						
+						//Diviser par le nbr de frame a la place de la duration
 						var stop = g.Gestures.Last();
-
-
 						var orientation = new Vector(GetDelta(g.Gestures, p => p.x),
 													  GetDelta(g.Gestures, p => p.y),
 													 GetDelta(g.Gestures, p => p.z));
-
+						var size = orientation.Magnitude;
 						orientation = Normalize(orientation);
 
-						var detected = new CircleGestureViewModel()
+						var detected = new LeapGestureViewModel(_Type)
 						{
 							Duration = TimeSpan.FromSeconds(stop.DurationSeconds),
 							Orientation = orientation,
-							FingersCount = gs.SelectMany(gg => gg.Gestures).SelectMany(gg => gg.Pointables).Select(i => i.Id).Distinct().Count()
+							FingersCount = gs.SelectMany(gg => gg.Gestures).SelectMany(gg => gg.Pointables).Select(i => i.Id).Distinct().Count(),
+							Speed = speed,
+							Size = size
 						};
 
-						Console.WriteLine(detected.ToString());
-						OnMatch(detected, 1.0);
+						if(detected.Speed > MinSpeed)
+							OnMatch(detected, 1.0);
 					});
 		}
 
@@ -75,7 +85,21 @@ namespace GestSpace
 			set;
 		}
 
+
+
 		public int FingersCount
+		{
+			get;
+			set;
+		}
+
+		public float Speed
+		{
+			get;
+			set;
+		}
+
+		public float Size
 		{
 			get;
 			set;
@@ -83,10 +107,19 @@ namespace GestSpace
 
 		public override string ToString()
 		{
-			return string.Format("Detected Duration : {0} ms, Orientation : {1}, Fingers : {2}",
+			return string.Format("Detected Duration : {0} ms, Orientation : {1}, Fingers : {2}, Speed : {3} unit/frame, Size : {4}",
 											(int)Duration.TotalMilliseconds,
 											Orientation.NiceToString(2),
-											FingersCount);
+											FingersCount,
+											Math.Round(Speed, 2),
+											Math.Round(Size,2));
+		}
+
+
+		public double MinSpeed
+		{
+			get;
+			set;
 		}
 	}
 }
