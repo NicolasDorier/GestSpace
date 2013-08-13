@@ -271,7 +271,12 @@ namespace GestSpace
 				acceptedValues.Add(val);
 			}
 			var closest = acceptedValues.GetClosest(key.ToUpperInvariant()).First();
-			throw new InterpreterException(key + " is not a valid parameter, do you mean " + closest.Value + " ?");
+			throw new InterpreterException(key + " is not a valid parameter, do you mean " + closest.Value + " ? (valid values are : \""+ Print(key, acceptedValues)+"\" )");
+		}
+
+		private string Print(string startWith, FuzzyCollection<string> acceptedValues)
+		{
+			return String.Join(",", acceptedValues.Where(a=>a.StartsWith(startWith, StringComparison.InvariantCultureIgnoreCase)).ToArray());
 		}
 
 		void AddCommandBinding(string commandType, Action<string[]> run, Action<string[]> validateParameters)

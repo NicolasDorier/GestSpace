@@ -70,7 +70,7 @@ namespace GestSpace
 			return Value + " " + Distance;
 		}
 	}
-	public class FuzzyCollection<T>
+	public class FuzzyCollection<T> : IEnumerable<T>
 	{
 		Func<T, T, int> _Metric;
 		public FuzzyCollection(Func<T, T, int> metric)
@@ -96,5 +96,23 @@ namespace GestSpace
 			_objs.Add(obj);
 			return obj;
 		}
+
+		#region IEnumerable<T> Members
+
+		public IEnumerator<T> GetEnumerator()
+		{
+			return _objs.GetEnumerator();
+		}
+
+		#endregion
+
+		#region IEnumerable Members
+
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		{
+			return _objs.GetEnumerator();
+		}
+
+		#endregion
 	}
 }
