@@ -103,7 +103,8 @@ namespace GestSpace
 			 animation.AutoReverse = true;
 
 			 var element = (Shape)this.FindName(ViewModel.LastSide + "Part");
-			 element.Fill.BeginAnimation(SolidColorBrush.ColorProperty, animation);
+			 if(element != null)
+				element.Fill.BeginAnimation(SolidColorBrush.ColorProperty, animation);
 			 
 		 }
 	}

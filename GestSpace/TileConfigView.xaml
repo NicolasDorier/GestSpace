@@ -363,7 +363,7 @@
                                      TextWrapping="NoWrap"
                                      MaxHeight="100"
                                      Height="100"
-                                     IsEnabled="{Binding CanModifyScript}" 
+                                     IsEnabled="{Binding SelectedEvent.CanModifyScript}" 
                                      Text="{Binding SelectedEvent.Command.Script, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                         <Ellipse Grid.Row="1"
                                  Grid.Column="1"

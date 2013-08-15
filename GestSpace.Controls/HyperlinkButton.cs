@@ -208,12 +208,15 @@ namespace GestSpace.Controls
 
 		void link_Click(object sender, RoutedEventArgs e)
 		{
+
 			if(link != null)
+			{
+				RefreshLink();
 				if(Click != null)
 					Click(this, e);
 				else if(GoTo != null)
 					Process.Start(GoTo);
-
+			}
 		}
 	}
 }
