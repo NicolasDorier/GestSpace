@@ -149,10 +149,8 @@ namespace GestSpace
 			if(!_Maximized)
 				return;
 			_Maximized = false;
-			if(ViewModel.CurrentTile != null)
-				ViewModel.CurrentTile.UpdateListener();
 			var animation = CreateDoubleAnimation(0.0, new Duration(TimeSpan.FromSeconds(0.5)));
-			list.BeginAnimation(OpacityProperty, animation);
+			this.BeginAnimation(OpacityProperty, animation);
 		}
 		private void Maximize()
 		{
@@ -162,10 +160,8 @@ namespace GestSpace
 			WindowState = System.Windows.WindowState.Maximized;
 			Topmost = false;
 			Topmost = true;
-			if(ViewModel.CurrentTile != null)
-				ViewModel.CurrentTile.UpdateListener();
 			var animation = CreateDoubleAnimation(1.0, new Duration(TimeSpan.FromSeconds(0.5)));
-			list.BeginAnimation(OpacityProperty, animation);
+			this.BeginAnimation(OpacityProperty, animation);
 		}
 
 		ReactiveListener listener;
@@ -212,33 +208,50 @@ namespace GestSpace
 					.SelectMany(f => f)
 					.Buffer(TimeSpan.FromMilliseconds(200), TimeSpan.FromMilliseconds(100))
 					.Where(b => b.Count > 0)
-					.Select(v => new Leap.Vector(v.Average(m => m.TipPosition.x), v.Average(m => m.TipPosition.y), 0.0f));
+					.Select(b => KeepPopularFinger(b))
+					.Select(v => new
+					{
+						Finger = v.First().Id,
+						Position = new Leap.Vector(v.Average(m => m.StabilizedTipPosition.x), v.Average(m => m.StabilizedTipPosition.y), 0.0f),
+					});
 
 
-				listener
+				var moveCenter = listener
 					.FingersMoves
 					.SelectMany(f => f)
-					.Select(v => v.TipPosition)
 					.CombineLatest(centers, ViewModel.SpaceListener.IsLocked, (p, center, locked) => new
 					{
 						Center = center,
-						Position = p.To2D(),
-						Move = p.To2D() - center,
-						Locked = locked
+						Position = p.StabilizedTipPosition.To2D(),
+						Move = p.StabilizedTipPosition.To2D() - center.Position,
+						Locked = locked,
+						Finger = p
 					})
-					.Where(o => o.Move.Magnitude >= 50.0)
-					.Sample(TimeSpan.FromMilliseconds(500))
-					.Where(p => !p.Locked)
+					.Where(p => p.Center.Finger == p.Finger.Id)
+					.Where(p => !p.Locked);
+
+
+				moveCenter
 					.ObserveOn(ui)
 					.Subscribe(o =>
 					{
-						if(ViewModel.Debug.FingerCount <= 2 && ViewModel.State == MainViewState.Navigating)
-						{
-							var angle = Helper.RadianToDegree(Math.Atan2(o.Move.y, o.Move.x));
-							if(!ViewModel.ShowConfig)
-								ViewModel.SelectTile(angle);
-						}
+						ViewModel.SelectionPosition = new Point(o.Move.x, o.Move.y);
 					});
+
+
+				moveCenter
+				.Where(o => o.Move.Magnitude >= 50.0)
+				.Sample(TimeSpan.FromMilliseconds(1000))
+				.ObserveOn(ui)
+				.Subscribe(o =>
+				{
+					if(ViewModel.Debug.FingerCount <= 2 && ViewModel.State == MainViewState.Navigating)
+					{
+						var angle = Helper.RadianToDegree(Math.Atan2(o.Move.y, o.Move.x));
+						if(!ViewModel.ShowConfig)
+							ViewModel.SelectTile(angle);
+					}
+				});
 
 
 
@@ -248,6 +261,13 @@ namespace GestSpace
 					Center();
 				}));
 			}));
+		}
+
+		private IList<Finger> KeepPopularFinger(IList<Finger> fingers)
+		{
+			var fingersById = fingers.GroupBy(f => f.Id);
+			var maxCount = fingersById.Max(g => g.Count());
+			return fingersById.First(g => g.Count() == maxCount).ToList();
 		}
 
 		private int? GetAngle(Finger f)

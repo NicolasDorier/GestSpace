@@ -509,6 +509,9 @@ namespace GestSpace
 				{
 					var old = _State;
 					_State = value;
+
+					if(old == MainViewState.Minimized)
+						LastUnMinimized = DateTime.UtcNow;
 					if(CurrentTile != null)
 						CurrentTile.IsLockedChanged();
 
@@ -576,5 +579,29 @@ namespace GestSpace
 				}
 			}
 		}
+
+		public DateTime LastUnMinimized
+		{
+			get;
+			private set;
+		}
+
+		private Point _SelectionPosition;
+		public Point SelectionPosition
+		{
+			get
+			{
+				return _SelectionPosition;
+			}
+			set
+			{
+				if(value != _SelectionPosition)
+				{
+					_SelectionPosition = value;
+					OnPropertyChanged(() => this.SelectionPosition);
+				}
+			}
+		}
+
 	}
 }

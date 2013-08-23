@@ -21,6 +21,7 @@
 
 
 
+
         <controls:Hex x:Name="hex" 
                   Background="{StaticResource BackgroundBrush}"
                   BorderBrush="{StaticResource LightForegroundBrush}"
@@ -94,6 +95,16 @@
             DataContext="{Binding CurrentTile}"></local:TileConfigView>-->
 
         <TextBlock x:Name="center" Text="" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"></TextBlock>
-
+        <!--<Ellipse Fill="{StaticResource LightForegroundBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                 RenderTransformOrigin="0.5,0.5"
+                 Height="20" Width="20">
+            <Ellipse.RenderTransform>
+                <TransformGroup>
+                    <TranslateTransform X="{Binding SelectionPosition.X}" Y="{Binding SelectionPosition.Y}"></TranslateTransform>
+                    <RotateTransform Angle="180"></RotateTransform>
+                    <ScaleTransform ScaleX="-1"></ScaleTransform>
+                </TransformGroup>
+            </Ellipse.RenderTransform>
+        </Ellipse>-->
     </Grid>
 </Window>

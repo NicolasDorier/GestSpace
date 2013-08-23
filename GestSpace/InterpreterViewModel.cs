@@ -1,6 +1,8 @@
-﻿using NicolasDorier.UI;
+﻿using GestSpace.Interop;
+using NicolasDorier.UI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +12,7 @@ namespace GestSpace
 	public class InterpreterCommandViewModel : NotifyPropertyChangedBase
 	{
 		private InterpreterViewModel interpreterViewModel;
-		
+
 
 		private string _Script;
 		public string Script
@@ -62,7 +64,7 @@ namespace GestSpace
 			}
 		}
 
-		
+
 		public bool HasException
 		{
 			get
@@ -79,11 +81,27 @@ namespace GestSpace
 		public InterpreterCommandViewModel(InterpreterViewModel interpreterViewModel, string[] commands)
 		{
 			this.interpreterViewModel = interpreterViewModel;
-			this.Script = String.Join("\r\n",commands);
+			this.Script = String.Join("\r\n", commands);
+		}
+		static InterpreterCommandViewModel()
+		{
+			using(Process p = Process.GetCurrentProcess())
+			{
+				_ProcessId = p.Id;
+			}
 		}
 
 		public void Execute()
 		{
+			if(IsCurrentProgram)
+			{
+				interpreterViewModel._Interpreter.Interpret(new string[] 
+				{ 
+					"DOWN ALT" ,
+					"PRESS TAB",
+					"UP ALT"
+				});
+			}
 			if(_ParsedCommands != null)
 				try
 				{
@@ -93,6 +111,20 @@ namespace GestSpace
 				{
 					Exception = ex;
 				}
+		}
+
+		static int _ProcessId;
+
+
+		public bool IsCurrentProgram
+		{
+			get
+			{
+				var hwnd = user32.GetForegroundWindow();
+				uint pid = 0;
+				user32.GetWindowThreadProcessId(hwnd, out pid);
+				return _ProcessId == pid;
+			}
 		}
 	}
 	public class InterpreterViewModel

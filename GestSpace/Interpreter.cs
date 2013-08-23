@@ -202,6 +202,7 @@ namespace GestSpace
 				else
 					foreach(var a in allArgs)
 						InputSimulator.SimulateKeyDown(a);
+				allArgs.Reverse();
 				foreach(var a in allArgs)
 					InputSimulator.SimulateKeyUp(a);
 

@@ -61,12 +61,7 @@ namespace GestSpace
 						.Subscribe(isLocked =>
 						{
 							if(!isLocked)
-								if(Current != null)
-								{
-									Current.Activated = false;
-									_Current = null;
-									OnPropertyChanged(() => this.Current);
-								}
+								ClearCurrent();
 						});
 			var updatePosition = spaceListener
 						.LockedHands
@@ -123,7 +118,18 @@ namespace GestSpace
 			CompositeDisposable subscriptions = new CompositeDisposable();
 			subscriptions.Add(deselectWhenUnlocked);
 			subscriptions.Add(updatePosition);
+			subscriptions.Add(Disposable.Create(ClearCurrent));
 			return subscriptions;
+		}
+
+		private void ClearCurrent()
+		{
+			if(Current != null)
+			{
+				Current.Activated = false;
+				_Current = null;
+				OnPropertyChanged(() => this.Current);
+			}
 		}
 
 		private void GoTo(ZoneTransitionViewModel zone)

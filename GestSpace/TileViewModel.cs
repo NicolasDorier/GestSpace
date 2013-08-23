@@ -57,6 +57,8 @@ namespace GestSpace
 		{
 			if(e.PropertyName == "IsUnused" && Main != null)
 				Main.UpdateFreeTiles();
+			if(e.PropertyName == "IsLocked")
+				UpdateListener();
 		}
 
 		private bool _TakeSuggestedName;
@@ -215,7 +217,7 @@ namespace GestSpace
 					Main.UI.Post(new SendOrPostCallback(o =>
 					{
 						OnPropertyChanged(() => this.IsUnused);
-					}),null);
+					}), null);
 					OnPropertyChanged(() => this.IsLocked);
 					OnPropertyChanged(() => this.IsSelected);
 				}
@@ -262,7 +264,7 @@ namespace GestSpace
 
 		internal void UpdateListener()
 		{
-			if(!_IsSelected || Main.State == MainViewState.Minimized)
+			if(!IsLocked)
 			{
 				_TileListener.Disposable = null;
 				_PresenterSubscription.Disposable = null;
@@ -311,7 +313,9 @@ namespace GestSpace
 		{
 			get
 			{
-				return Main.State == MainViewState.Locked && _IsSelected;
+				if(Main == null)
+					return false;
+				return Main.State == MainViewState.Locked && _IsSelected;// && DateTime.UtcNow - Main.LastUnMinimized > TimeSpan.FromSeconds(0.5);
 			}
 		}
 

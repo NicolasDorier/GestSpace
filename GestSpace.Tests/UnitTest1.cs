@@ -8,6 +8,14 @@ namespace GestSpace.Tests
 	public class UnitTest1
 	{
 		[TestMethod]
+		public void ShowLastWindows()
+		{
+			AltTab win = new AltTab();
+			win.ShowDialog();
+		}
+
+
+		[TestMethod]
 		public void CanInterpret()
 		{
 			Interpreter interpreter = new Interpreter();
