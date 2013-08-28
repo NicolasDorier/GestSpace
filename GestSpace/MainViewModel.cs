@@ -48,7 +48,7 @@ namespace GestSpace
 		{
 			var fps = reactiveSpace.ReactiveListener.Frames
 					.Timestamp()
-					.Buffer(2)
+					.Buffer(2,1)
 					.ObserveOn(main.UI)
 					.Subscribe(o =>
 					{

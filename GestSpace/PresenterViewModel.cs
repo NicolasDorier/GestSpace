@@ -26,7 +26,7 @@ namespace GestSpace
 
 		public virtual void Dispose()
 		{
-			
+
 		}
 
 
@@ -65,6 +65,7 @@ namespace GestSpace
 										}))
 								.Subscribe());
 			subscriptions.Add(SubscribeCore(spaceListener));
+			subscriptions.Add(Disposable.Create(()=>HandsCount = 0));
 			return subscriptions;
 		}
 
@@ -77,15 +78,18 @@ namespace GestSpace
 			}
 			set
 			{
-				_HandsCount = value;
-				if(_HandsCount < 0)
-					_HandsCount = 0;
-				if(_HandsCount == 0)
-					if(OnRelease != null)
-						OnRelease();
-				if(_HandsCount == 1)
-					if(OnEnter != null)
-						OnEnter();
+				if(_HandsCount != value && value >= 0)
+				{
+					_HandsCount = value;
+					if(_HandsCount < 0)
+						_HandsCount = 0;
+					if(_HandsCount == 0)
+						if(OnRelease != null)
+							OnRelease();
+					if(_HandsCount == 1)
+						if(OnEnter != null)
+							OnEnter();
+				}
 			}
 		}
 
