@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -16,7 +17,7 @@ namespace GestSpace
 		public readonly static PresenterViewModel Unused = new PresenterViewModel();
 
 		public static SynchronizationContext UI = SynchronizationContext.Current;
-		public virtual IDisposable Subscribe(ReactiveSpace spaceListener)
+		protected virtual IDisposable SubscribeCore(ReactiveSpace spaceListener)
 		{
 			return Disposable.Empty;
 		}
@@ -26,6 +27,66 @@ namespace GestSpace
 		public virtual void Dispose()
 		{
 			
+		}
+
+
+		public Action OnEnter
+		{
+			get;
+			set;
+		}
+		public Action OnRelease
+		{
+			get;
+			set;
+		}
+
+		public IDisposable Subscribe(ReactiveSpace spaceListener)
+		{
+			CompositeDisposable subscriptions = new CompositeDisposable();
+			subscriptions.Add(spaceListener
+								.LockedHands
+								.ObserveOn(UI)
+								.Subscribe(o =>
+								{
+									HandsCount++;
+								}));
+
+			subscriptions.Add(spaceListener
+								.LockedHands
+								.Select(o =>
+										o
+										.ObserveOn(UI)
+										.Subscribe(oo =>
+										{
+										}, () =>
+										{
+											HandsCount--;
+										}))
+								.Subscribe());
+			subscriptions.Add(SubscribeCore(spaceListener));
+			return subscriptions;
+		}
+
+		int _HandsCount;
+		int HandsCount
+		{
+			get
+			{
+				return _HandsCount;
+			}
+			set
+			{
+				_HandsCount = value;
+				if(_HandsCount < 0)
+					_HandsCount = 0;
+				if(_HandsCount == 0)
+					if(OnRelease != null)
+						OnRelease();
+				if(_HandsCount == 1)
+					if(OnEnter != null)
+						OnEnter();
+			}
 		}
 
 		#endregion

@@ -90,6 +90,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CyclePresenterView.xaml.cs">
+      <DependentUpon>CyclePresenterView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CyclePresenterViewModel.cs" />
     <Compile Include="ForegroundProgramListener.cs" />
     <Compile Include="GestSpaceRepository.cs" />
     <Compile Include="LeapGestureViewModel.cs" />
@@ -135,6 +139,10 @@
       <DependentUpon>ZoneView.xaml</DependentUpon>
     </Compile>
     <Page Include="ClickPresenterView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CyclePresenterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

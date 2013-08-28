@@ -24,7 +24,7 @@ namespace GestSpace
 
 			FingersMoves = Frames
 							.SelectMany(f => f.Fingers)
-							.GroupByUntil(f => f, f => f.OnlyTimeout(TimeSpan.FromMilliseconds(300)), AnonymousComparer.Create((Finger g) => g.Id));
+							.GroupByUntil(f => f, f => f.Throttle(TimeSpan.FromMilliseconds(300)).Take(1), AnonymousComparer.Create((Finger g) => g.Id));
 
 			HandsMoves = GetHandsMoves(h => false);
 		}

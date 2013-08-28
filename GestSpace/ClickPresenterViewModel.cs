@@ -55,7 +55,7 @@ namespace GestSpace
 			set;
 		}
 
-		public override IDisposable Subscribe(ReactiveSpace spaceListener)
+		protected override IDisposable SubscribeCore(ReactiveSpace spaceListener)
 		{
 			return spaceListener
 				.LockedHands

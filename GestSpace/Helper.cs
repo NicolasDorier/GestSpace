@@ -57,6 +57,10 @@ namespace GestSpace
 			return Math.Round(v.x,decimals) + ", "  + Math.Round(v.y,decimals) + ", " + Math.Round(v.z,decimals);
 		}
 
+		public static double DegreeeToRadian(double angle)
+		{
+			return angle / (180.0 / Math.PI);
+		}
 		public static double RadianToDegree(double angle)
 		{
 			return angle * (180.0 / Math.PI);

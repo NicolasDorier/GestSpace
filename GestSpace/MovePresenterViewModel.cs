@@ -17,26 +17,7 @@ namespace GestSpace
 		{
 			MinInterval = 50.0;
 		}
-		int _HandsCount;
-		int HandsCount
-		{
-			get
-			{
-				return _HandsCount;
-			}
-			set
-			{
-				_HandsCount = value;
-				if(_HandsCount < 0)
-					_HandsCount = 0;
-				if(_HandsCount == 0)
-					if(OnRelease != null)
-						OnRelease();
-				if(_HandsCount == 1)
-					if(OnEnter != null)
-						OnEnter();
-			}
-		}
+		
 
 		public double MinInterval
 		{
@@ -44,16 +25,7 @@ namespace GestSpace
 			set;
 		}
 
-		public Action OnEnter
-		{
-			get;
-			set;
-		}
-		public Action OnRelease
-		{
-			get;
-			set;
-		}
+		
 		public Action OnMoveUp
 		{
 			get;
@@ -72,30 +44,10 @@ namespace GestSpace
 			set;
 		}
 
-		public override IDisposable Subscribe(ReactiveSpace spaceListener)
+		protected override IDisposable SubscribeCore(ReactiveSpace spaceListener)
 		{
 			CompositeDisposable subscriptions = new CompositeDisposable();
-			subscriptions.Add(spaceListener
-								.LockedHands
-								.ObserveOn(UI)
-								.Subscribe(o =>
-								{
-									HandsCount++;
-								}));
-
-			subscriptions.Add(spaceListener
-								.LockedHands
-								.Select(o =>
-										o
-										.ObserveOn(UI)
-										.Subscribe(oo =>
-										{
-										}, () =>
-										{
-											HandsCount--;
-										}))
-								.Subscribe());
-
+			
 
 			subscriptions.Add(spaceListener
 				.LockedHands

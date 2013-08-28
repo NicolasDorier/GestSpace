@@ -73,7 +73,10 @@
         <DataTemplate DataType="{x:Type local:MovePresenterViewModel}">
             <Path Fill="{StaticResource NormalForegroundBrush}" Data="{StaticResource MoveUpDownGeometry}" Stretch="Uniform"></Path>
         </DataTemplate>
-        
+
+        <DataTemplate DataType="{x:Type local:CyclePresenterViewModel}">
+            <local:CyclePresenterView></local:CyclePresenterView>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type local:ClickPresenterViewModel}">
             <local:ClickPresenterView></local:ClickPresenterView>
         </DataTemplate>

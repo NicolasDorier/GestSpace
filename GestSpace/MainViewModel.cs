@@ -58,16 +58,21 @@ namespace GestSpace
 
 			var fingerCount = reactiveSpace.ReactiveListener.FingersMoves
 					.ObserveOn(main.UI)
-					.Do(o => FingerCount++)
-					.Select(f => f.ObserveOn(main.UI).Subscribe(o =>
-					{
+					.Subscribe(o => FingerCount++);
+			_Subscriptions.Add(fingerCount);
 
+			fingerCount = reactiveSpace.ReactiveListener.FingersMoves
+					.Select(c => c.Subscribe(cc =>
+					{
 					}, () =>
 					{
+						Console.WriteLine("done");
 						FingerCount--;
-					})).Subscribe();
-
+					}))
+					.Subscribe();
 			_Subscriptions.Add(fingerCount);
+
+			
 			_Subscriptions.Add(fps);
 		}
 		public int FingerCount
@@ -153,6 +158,17 @@ namespace GestSpace
 											"UP SHIFT"),
 					OnRelease = Interpreter.Simulate("UP ALT")
 				}
+			));
+			_PresenterTemplates.Add(new PresenterTemplateViewModel("Switch windows 2", () => new CyclePresenterViewModel()
+			{
+				OnEnter = Interpreter.Simulate("DOWN ALT"),
+				OnClockWise = Interpreter.Simulate("PRESS TAB"),
+				OnCounterClockWise = Interpreter.Simulate(
+										"DOWN SHIFT",
+										"PRESS TAB",
+										"UP SHIFT"),
+				OnRelease = Interpreter.Simulate("UP ALT")
+			}
 			));
 			_PresenterTemplates.Add(new PresenterTemplateViewModel("Volume", () => VolumePresenterViewModel.Create()));
 			_PresenterTemplates.Add(new PresenterTemplateViewModel("Dock window", () => new ZonePresenterViewModel()
@@ -349,15 +365,15 @@ namespace GestSpace
 		private void RemoveOccupiedUnused()
 		{
 			var stacks = _Tiles
-				.GroupBy(t=>t.Position);
-				
+				.GroupBy(t => t.Position);
+
 
 			foreach(var stack in stacks)
 			{
 				var usedTile = stack.FirstOrDefault(t => !t.IsUnused);
 				if(usedTile == null)
 					usedTile = stack.LastOrDefault();
-				foreach(var tile in stack.Where(t=>t != usedTile))
+				foreach(var tile in stack.Where(t => t != usedTile))
 				{
 					_Tiles.Remove(tile);
 				}
@@ -562,7 +578,7 @@ namespace GestSpace
 				   });
 		}
 
-		
+
 		private string _CurrentProgram;
 		public string CurrentProgram
 		{
