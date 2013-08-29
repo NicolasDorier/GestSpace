@@ -33,7 +33,9 @@ namespace GestSpace
 		public MainWindow()
 		{
 			InitializeComponent();
-
+#if !DEBUG
+			this.debug.Visibility = System.Windows.Visibility.Collapsed;
+#endif
 
 			root.SetBinding(Grid.DataContextProperty, new Binding()
 			{

@@ -63,10 +63,11 @@ namespace GestSpace
 		}
 
 
-		public static IObservable<bool> OnlyTimeout<T>(this IObservable<T> obs, TimeSpan time)
+		public static IObservable<T> ThrottleWithDefault<T>(this IObservable<T> input, TimeSpan time, T defaultValue = default(T))
 		{
-			return obs.Select((o) => false).Timeout(time, Observable.Return(true)).Where((o) => o);
+			return input.Merge(Observable.Return(defaultValue)).Throttle(time);
 		}
+		
 		public static IList<T> Drain<T>(this IObservable<T> stream)
 		{
 			List<T> list = new List<T>();

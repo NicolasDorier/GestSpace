@@ -10,7 +10,7 @@
         xmlns:local="clr-namespace:GestSpace"
         >
     <Grid x:Name="root">
-        <Border DataContext="{Binding Debug}" Visibility="Visible" Background="Black" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Right">
+        <Border x:Name="debug" DataContext="{Binding Debug}" Visibility="Visible" Background="Black" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Right">
             <UniformGrid Columns="2">
                 <TextBlock Margin="5">FPS</TextBlock>
                 <TextBlock Text="{Binding FPS}"></TextBlock>

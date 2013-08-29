@@ -48,7 +48,7 @@ namespace GestSpace
 		{
 			var fps = reactiveSpace.ReactiveListener.Frames
 					.Timestamp()
-					.Buffer(2,1)
+					.Buffer(2, 1)
 					.ObserveOn(main.UI)
 					.Subscribe(o =>
 					{
@@ -58,21 +58,26 @@ namespace GestSpace
 
 			var fingerCount = reactiveSpace.ReactiveListener.FingersMoves
 					.ObserveOn(main.UI)
-					.Subscribe(o => FingerCount++);
+					.Subscribe(o =>
+					{
+						Console.WriteLine("Start " + o.Key.Id);
+						FingerCount++;
+					});
 			_Subscriptions.Add(fingerCount);
 
 			fingerCount = reactiveSpace.ReactiveListener.FingersMoves
 					.Select(c => c.Subscribe(cc =>
 					{
+
 					}, () =>
 					{
-						Console.WriteLine("done");
+						Console.WriteLine("End " + c.Key.Id + "-" + (FingerCount - 1));
 						FingerCount--;
 					}))
 					.Subscribe();
 			_Subscriptions.Add(fingerCount);
 
-			
+
 			_Subscriptions.Add(fps);
 		}
 		public int FingerCount
@@ -225,9 +230,7 @@ namespace GestSpace
 				.ReactiveListener
 				.FingersMoves
 				.SelectMany(m => m)
-				.Select((m) => false)
-				.OnlyTimeout(TimeSpan.FromSeconds(1))
-				.Repeat()
+				.ThrottleWithDefault(TimeSpan.FromSeconds(1))
 				.ObserveOn(UI)
 				.Subscribe(b =>
 				{
