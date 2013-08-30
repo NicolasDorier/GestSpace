@@ -46,7 +46,7 @@ namespace GestSpace
 		CompositeDisposable _Subscriptions = new CompositeDisposable();
 		private void Subscribe(ReactiveSpace reactiveSpace)
 		{
-			var fps = reactiveSpace.ReactiveListener.Frames
+			var fps = reactiveSpace.ReactiveListener.Frames()
 					.Timestamp()
 					.Buffer(2, 1)
 					.ObserveOn(main.UI)
@@ -56,22 +56,20 @@ namespace GestSpace
 						FPS = (int)(1.0 / seconds);
 					});
 
-			var fingerCount = reactiveSpace.ReactiveListener.FingersMoves
+			var fingerCount = reactiveSpace.ReactiveListener.FingersMoves()
 					.ObserveOn(main.UI)
 					.Subscribe(o =>
 					{
-						Console.WriteLine("Start " + o.Key.Id);
 						FingerCount++;
 					});
 			_Subscriptions.Add(fingerCount);
 
-			fingerCount = reactiveSpace.ReactiveListener.FingersMoves
+			fingerCount = reactiveSpace.ReactiveListener.FingersMoves()
 					.Select(c => c.Subscribe(cc =>
 					{
 
 					}, () =>
 					{
-						Console.WriteLine("End " + c.Key.Id + "-" + (FingerCount - 1));
 						FingerCount--;
 					}))
 					.Subscribe();
@@ -228,7 +226,7 @@ namespace GestSpace
 			var minimized =
 				spaceListener
 				.ReactiveListener
-				.FingersMoves
+				.FingersMoves()
 				.SelectMany(m => m)
 				.ThrottleWithDefault(TimeSpan.FromSeconds(1))
 				.ObserveOn(UI)
@@ -263,7 +261,7 @@ namespace GestSpace
 
 			var maximize =
 						spaceListener
-						.LockedHands
+						.LockedHands()
 						.SelectMany(h => h)
 						.ObserveOn(UI)
 						.Subscribe(h =>
@@ -274,7 +272,7 @@ namespace GestSpace
 
 			var lockedSubs =
 				spaceListener
-				.IsLocked
+				.IsLocked()
 				.ObserveOn(UI)
 				.CombineLatest(Helper.PropertyChanged(this, () => this.State), (l, s) => new
 				{

@@ -58,7 +58,7 @@ namespace GestSpace
 		protected override IDisposable SubscribeCore(ReactiveSpace spaceListener)
 		{
 			return spaceListener
-				.LockedHands
+				.LockedHands()
 				.SelectMany(l => l)
 				.Where(h => Math.Abs(h.PalmVelocity.y) > VelocityThreshold || Math.Abs(h.PalmVelocity.x) > VelocityThreshold)
 				.Sample(MinInterval)

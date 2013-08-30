@@ -19,7 +19,7 @@ namespace GestSpace
 		{
 			return space
 					.ReactiveListener
-					.Gestures
+					.Gestures()
 					.Where(g => g.Key.Type == _Type)
 					.SelectMany(g => g.ToList().Select(l => new
 					{

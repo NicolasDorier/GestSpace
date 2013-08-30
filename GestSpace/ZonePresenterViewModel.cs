@@ -56,7 +56,7 @@ namespace GestSpace
 		protected override IDisposable SubscribeCore(ReactiveSpace spaceListener)
 		{
 			var deselectWhenUnlocked = 
-				       spaceListener.IsLocked
+				       spaceListener.IsLocked()
 						.ObserveOn(UI)
 						.Subscribe(isLocked =>
 						{
@@ -64,7 +64,7 @@ namespace GestSpace
 								ClearCurrent();
 						});
 			var updatePosition = spaceListener
-						.LockedHands
+						.LockedHands()
 						.ObserveOn(UI)
 						.Select(g => new
 						{

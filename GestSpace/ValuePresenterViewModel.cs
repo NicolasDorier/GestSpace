@@ -48,7 +48,7 @@ namespace GestSpace
 		protected override IDisposable SubscribeCore(ReactiveSpace spaceListener)
 		{
 			return
-				spaceListener.LockedHands
+				spaceListener.LockedHands()
 				.ObserveOn(UI)
 				.Select(g => new
 				{

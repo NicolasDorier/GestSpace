@@ -45,7 +45,7 @@ namespace GestSpace
 		{
 			CompositeDisposable subscriptions = new CompositeDisposable();
 			subscriptions.Add(spaceListener
-								.LockedHands
+								.LockedHands()
 								.ObserveOn(UI)
 								.Subscribe(o =>
 								{
@@ -53,7 +53,7 @@ namespace GestSpace
 								}));
 
 			subscriptions.Add(spaceListener
-								.LockedHands
+								.LockedHands()
 								.Select(o =>
 										o
 										.ObserveOn(UI)

@@ -50,7 +50,7 @@ namespace GestSpace
 			
 
 			subscriptions.Add(spaceListener
-				.LockedHands
+				.LockedHands()
 				.ObserveOn(UI)
 				.SelectMany(h => h
 								.Select(hh => new

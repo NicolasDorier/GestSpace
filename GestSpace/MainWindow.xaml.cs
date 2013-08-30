@@ -206,7 +206,7 @@ namespace GestSpace
 
 				var centers =
 					listener
-					.FingersMoves
+					.FingersMoves()
 					.SelectMany(f => f)
 					.Buffer(TimeSpan.FromMilliseconds(200), TimeSpan.FromMilliseconds(100))
 					.Where(b => b.Count > 0)
@@ -219,9 +219,9 @@ namespace GestSpace
 
 
 				var moveCenter = listener
-					.FingersMoves
+					.FingersMoves()
 					.SelectMany(f => f)
-					.CombineLatest(centers, ViewModel.SpaceListener.IsLocked, (p, center, locked) => new
+					.CombineLatest(centers, ViewModel.SpaceListener.IsLocked(), (p, center, locked) => new
 					{
 						Center = center,
 						Position = p.StabilizedTipPosition.To2D(),

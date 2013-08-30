@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using Leap;
 using System.Windows.Media;
+using System.Threading;
 
 namespace GestSpace
 {
@@ -69,16 +70,13 @@ namespace GestSpace
 			}
 		}
 
+		
 		protected override IDisposable SubscribeCore(ReactiveSpace spaceListener)
 		{
-			CompositeDisposable disposables = new CompositeDisposable();
-
-
-			var gestures =
-
+			return
 				spaceListener
 				.ReactiveListener
-				.FingersMoves
+				.FingersMoves()
 				.Concat()
 				.ObserveOn(UI)
 				.Subscribe(c =>
@@ -94,10 +92,8 @@ namespace GestSpace
 					var man = tan.Dot(v);
 
 					Rotation -= man / 120;
-				});
 
-			disposables.Add(gestures);
-			return disposables;
+				});
 		}
 	}
 }

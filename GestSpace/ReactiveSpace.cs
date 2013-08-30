@@ -26,51 +26,44 @@ namespace GestSpace
 
 
 		IObservable<bool> _IsLocked;
-		public IObservable<bool> IsLocked
+		public IObservable<bool> IsLocked()
 		{
-			get
+			if(_IsLocked == null)
 			{
-				if(_IsLocked == null)
-				{
-					var replay = listener
-								.Frames
-								.SelectMany(f => f.Hands)
-								.Where(h => h.Fingers.Count >= 4)
-								.Select(s => true)
-								.Timeout(TimeSpan.FromMilliseconds(200), Observable.Return(false).Take(1))
-								.Repeat()
-								.DistinctUntilChanged()
-								.Replay(1);
-					replay.Connect();
-					_IsLocked = replay;
-				}
-				return _IsLocked;
+				var replay = listener
+							.Frames()
+							.SelectMany(f => f.Hands)
+							.Where(h => h.Fingers.Count >= 4)
+							.Select(s => true)
+							.Timeout(TimeSpan.FromMilliseconds(200), Observable.Return(false).Take(1))
+							.Repeat()
+							.DistinctUntilChanged()
+							.Replay(1);
+				replay.Connect();
+				_IsLocked = replay;
 			}
+			return _IsLocked;
 		}
 
-		IObservable<IGroupedObservable<Hand, Hand>> _LockedHands;
-		public IObservable<IGroupedObservable<Hand, Hand>> LockedHands
+
+		public IObservable<IGroupedObservable<Hand, Hand>> LockedHands()
 		{
-			get
-			{
-				if(_LockedHands == null)
-					_LockedHands = listener
-									.Frames
-									.SelectMany(f => f.Hands)
-									.CombineLatest(IsLocked, (a, b) => new
-									{
-										IsLocked = b,
-										Group = a
-									})
-									.Where(l => l.IsLocked)
-									.Select(l => l.Group)
-									.GroupByUntil(
-													h => h,
-													g => IsLocked.Where(t => !t),
-													AnonymousComparer.Create((Hand hand) => hand.Id)
-												);
-				return _LockedHands;
-			}
+			return listener
+					.Frames()
+					.SelectMany(f => f.Hands)
+					.CombineLatest(IsLocked(), (a, b) => new
+					{
+						IsLocked = b,
+						Group = a
+					})
+					.Where(l => l.IsLocked)
+					.Select(l => l.Group)
+					.GroupByUntil(
+									h => h,
+									g => IsLocked().Where(t => !t),
+									AnonymousComparer.Create((Hand hand) => hand.Id)
+								);
 		}
 	}
 }
+

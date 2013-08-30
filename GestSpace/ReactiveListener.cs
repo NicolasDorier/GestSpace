@@ -16,49 +16,49 @@ namespace GestSpace
 
 		public ReactiveListener()
 		{
-			Frames = NewFrameDetected;
-			Gestures = Frames
-							.SelectMany(f => f.Gestures())
-							.GroupByUntil(g => g, gr => gr.Where(g => g.State == Gesture.GestureState.STATESTOP).Take(1), AnonymousComparer.Create((Gesture g) => g.Id));
+			
+			
 
-
-			FingersMoves = Frames
-							.SelectMany(f => f.Fingers)
-							.GroupByUntil(f => f, f => f.ThrottleWithDefault(TimeSpan.FromMilliseconds(300)).Take(1), AnonymousComparer.Create((Finger g) => g.Id));
-
-			HandsMoves = GetHandsMoves(h => false);
 		}
 
-		public IObservable<Frame> Frames
+		public IObservable<Frame> Frames()
 		{
-			get;
-			private set;
+			return NewFrameDetected;
+		}
+
+		public IObservable<IGroupedObservable<Finger, Finger>> FingersMoves()
+		{
+			return Frames()
+							.SelectMany(f => f.Fingers)
+							.GroupByUntil(f => f, 
+							f => f.ThrottleWithDefault(TimeSpan.FromMilliseconds(300)).Take(1), 
+							AnonymousComparer.Create((Finger g) => g.Id));
+		}
+
+		public IObservable<IGroupedObservable<Hand, Hand>> HandsMoves()
+		{
+			return GetHandsMoves(h => false);
 		}
 
 		public IObservable<IGroupedObservable<Hand, Hand>> GetHandsMoves(Func<Hand, bool> until)
 		{
-			return Frames
+			return Frames()
 							.SelectMany(f => f.Hands)
 							.GroupByUntil(f => f, f => f.ThrottleWithDefault(TimeSpan.FromMilliseconds(300))
 														.Amb(f.Where(until))
 														.Take(1), AnonymousComparer.Create((Hand hand) => hand.Id));
 		}
 
-		public IObservable<IGroupedObservable<Finger, Finger>> FingersMoves
-		{
-			get;
-			private set;
-		}
-		public IObservable<IGroupedObservable<Hand, Hand>> HandsMoves
-		{
-			get;
-			private set;
-		}
+		
+		
 
-		public IObservable<IGroupedObservable<Gesture, Gesture>> Gestures
+		public IObservable<IGroupedObservable<Gesture, Gesture>> Gestures()
 		{
-			get;
-			private set;
+			return Frames()
+					.SelectMany(f => f.Gestures())
+					.GroupByUntil(g => g, 
+					gr => gr.Where(g => g.State == Gesture.GestureState.STATESTOP).Take(1),
+					AnonymousComparer.Create((Gesture g) => g.Id));
 		}
 
 		public override void OnInit(Controller controller)
