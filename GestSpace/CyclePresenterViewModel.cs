@@ -47,19 +47,20 @@ namespace GestSpace
 				if(value != _Rotation)
 				{
 					double increment = 360 / IncrementCount;
-					int oldBin = (int)(_Rotation / increment);
-					_Rotation = value;
+					var oldRotation = _Rotation;
+
 					if(_Rotation > 360)
 						_Rotation -= 360;
 					if(_Rotation < 0)
 						_Rotation += 360;
+					_Rotation = value;
 
+					int oldBin = (int)(oldRotation / increment);
 					int newBin = (int)(_Rotation / increment);
 
 					if(newBin != oldBin)
 					{
-						bool goNext = oldBin < newBin || newBin == 0 && oldBin == IncrementCount - 1;
-						goNext = goNext && !(newBin == IncrementCount - 1 && oldBin == 0);
+						bool goNext = IsLower(oldBin, newBin);
 						if(goNext && OnClockWise != null)
 							OnClockWise();
 						if(!goNext && OnCounterClockWise != null)
@@ -68,6 +69,13 @@ namespace GestSpace
 					OnPropertyChanged(() => this.Rotation);
 				}
 			}
+		}
+
+		private bool IsLower(int oldBin, int newBin)
+		{
+			var goNext = oldBin < newBin || newBin == 0 && oldBin == IncrementCount - 1;
+			goNext = goNext && !(newBin == IncrementCount - 1 && oldBin == 0);
+			return goNext;
 		}
 
 		
