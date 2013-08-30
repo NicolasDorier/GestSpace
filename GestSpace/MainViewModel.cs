@@ -64,8 +64,9 @@ namespace GestSpace
 					});
 			_Subscriptions.Add(fingerCount);
 
-			fingerCount = reactiveSpace.ReactiveListener.FingersMoves()
-					.Select(c => c.Subscribe(cc =>
+			fingerCount = reactiveSpace.ReactiveListener
+					.FingersMoves()
+					.Select(c => c.ObserveOn(main.UI).Subscribe(cc =>
 					{
 
 					}, () =>
