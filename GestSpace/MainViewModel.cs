@@ -48,7 +48,7 @@ namespace GestSpace
 		{
 			var fps = reactiveSpace.ReactiveListener.Frames()
 					.Timestamp()
-					.Buffer(2, 1)
+					.Buffer(2)
 					.ObserveOn(main.UI)
 					.Subscribe(o =>
 					{
@@ -120,7 +120,7 @@ namespace GestSpace
 								using(var p = Process.GetProcessById(pid))
 								{
 									CurrentProgram = p.ProcessName;
-									var tile = Tiles.FirstOrDefault(t => t.FastContext == p.ProcessName);
+									var tile = Tiles.FirstOrDefault(t => t.BelongsToFastContext(p.ProcessName));
 									if(tile != null)
 										CurrentTile = tile;
 								}

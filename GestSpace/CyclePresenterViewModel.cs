@@ -99,7 +99,7 @@ namespace GestSpace
 
 					var man = tan.Dot(v);
 
-					Rotation -= man / 120;
+					Rotation -= man / 100;
 
 				});
 		}

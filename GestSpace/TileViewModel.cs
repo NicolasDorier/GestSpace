@@ -78,6 +78,22 @@ namespace GestSpace
 			}
 		}
 
+		private  ICommand _AddToCurrentProgram;
+		public ICommand AddToCurrentProgram
+		{
+			get
+			{
+				if(_AddToCurrentProgram == null)
+				{
+					_AddToCurrentProgram = new DelegateCommand(o =>
+					{
+						FastContext = FastContext + " or " + Main.CurrentProgram;
+					}, o => true);
+				}
+				return _AddToCurrentProgram;
+			}
+		}
+
 		private ICommand _SetToCurrentProgram;
 		public ICommand SetToCurrentProgram
 		{
@@ -350,6 +366,8 @@ namespace GestSpace
 			{
 				if(value != _Presenter)
 				{
+					if(_Presenter != null)
+						_Presenter.Dispose();
 					_Presenter = value;
 					UpdateEvents();
 					UpdateListener();
@@ -423,6 +441,16 @@ namespace GestSpace
 					OnPropertyChanged(() => this.FastContext);
 				}
 			}
+		}
+
+		internal bool BelongsToFastContext(string program)
+		{
+			if(string.IsNullOrEmpty(FastContext))
+				return false;
+
+			return FastContext.Split(new string[] { " OR ", " or " }, StringSplitOptions.RemoveEmptyEntries)
+					   .Select(s => s.Trim())
+					   .Any(s => s.Equals(program, StringComparison.InvariantCultureIgnoreCase));
 		}
 	}
 }

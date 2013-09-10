@@ -2,13 +2,14 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:GestSpace.Controls;assembly=GestSpace.Controls"
+             xmlns:converters="clr-namespace:GestSpace.Converters"
              xmlns:local="clr-namespace:GestSpace"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-       
+        <converters:HideIfEmptyConverter x:Key="hideIfEmpty"></converters:HideIfEmptyConverter>
 
 
-        <Color x:Key="NormalForeground">Gray</Color>
+            <Color x:Key="NormalForeground">Gray</Color>
         <Color x:Key="LightForeground">LightGray</Color>
         <Color x:Key="Background">White</Color>
         <Color x:Key="AltBackground">#B5DCFF</Color>

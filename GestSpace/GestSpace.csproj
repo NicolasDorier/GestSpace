@@ -90,6 +90,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\HideIfEmptyConverter.cs" />
     <Compile Include="CyclePresenterView.xaml.cs">
       <DependentUpon>CyclePresenterView.xaml</DependentUpon>
     </Compile>

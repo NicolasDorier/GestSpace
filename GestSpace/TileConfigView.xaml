@@ -335,6 +335,9 @@
                             <StackPanel Orientation="Horizontal" Margin="10,-20,0,0">
                                 <TextBlock Text="Current program is "></TextBlock>
                                 <controls:HyperlinkButton Text="{Binding Main.CurrentProgram}" Command="{Binding SetToCurrentProgram}" Margin="0,-11,0,0"></controls:HyperlinkButton>
+                                <TextBlock Text=" [" Visibility="{Binding Main.CurrentProgram, Converter={StaticResource hideIfEmpty}}"></TextBlock>
+                                <controls:HyperlinkButton Text="+" Command="{Binding AddToCurrentProgram}" Margin="0,-11,0,0" Visibility="{Binding Main.CurrentProgram, Converter={StaticResource hideIfEmpty}}"></controls:HyperlinkButton>
+                                <TextBlock Text="]" Visibility="{Binding Main.CurrentProgram, Converter={StaticResource hideIfEmpty}}"></TextBlock>
                             </StackPanel>
                         </controls:AutoArrangeGrid>
                     </DockPanel>
