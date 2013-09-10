@@ -285,7 +285,7 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid>
-            
+
 
             <TabControl Padding="20">
                 <TabItem Header="Main" HeaderTemplate="{StaticResource TabHeaderTemplate}">
@@ -370,6 +370,7 @@
                                      Text="{Binding SelectedEvent.Command.Script, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
                         <Ellipse Grid.Row="1"
                                  Grid.Column="1"
+                                 x:Name="ellipse"
                                  Visibility="{Binding SelectedEvent.Command.HasException, Converter={StaticResource BooleanToVisibility}}"
                                 DockPanel.Dock="Right" 
                                 HorizontalAlignment="Right"
@@ -382,9 +383,6 @@
                                     <GradientStop Color="#FFFF0000" Offset="1" />
                                 </LinearGradientBrush>
                             </Ellipse.Fill>
-                            <Ellipse.ToolTip>
-                                <ToolTip Content="{Binding SelectedEvent.Command.Exception.Message}"></ToolTip>
-                            </Ellipse.ToolTip>
                         </Ellipse>
                         <controls:HyperlinkButton 
                             Grid.Row="2"
@@ -394,6 +392,18 @@
                             Command="{Binding ClearAllEvents}"
                             Text="Clear all events"
                             ></controls:HyperlinkButton>
+                        <Popup x:Name="errorTooltip"
+                               PlacementTarget="{Binding ElementName=ellipse}"
+                               >
+                            <Border 
+                                      Background="{DynamicResource BackgroundBrush}" 
+                                      BorderThickness="3"                    
+                                      BorderBrush="{DynamicResource LightForegroundBrush}">
+                                <TextBlock Foreground="{DynamicResource NormalForegroundBrush}"
+                                           VerticalAlignment="Bottom"
+                                       Text="{Binding SelectedEvent.Command.Exception.Message}"></TextBlock>
+                            </Border>
+                        </Popup>
                     </Grid>
                 </TabItem>
             </TabControl>

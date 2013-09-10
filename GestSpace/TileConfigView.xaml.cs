@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -12,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Threading;
 
 namespace GestSpace
 {
@@ -26,10 +30,56 @@ namespace GestSpace
 			SetBinding(ViewModelProperty, new Binding());
 			SetBinding(CanShowProperty, new Binding("Main.ShowConfig"));
 			SetBinding(IsSelectedProperty, new Binding("IsSelected"));
+			SetBinding(HasExceptionProperty, new Binding("SelectedEvent.Command.HasException"));
 			UpdateStates(false);
 		}
 
 
+
+		public bool HasException
+		{
+			get
+			{
+				return (bool)GetValue(HasExceptionProperty);
+			}
+			set
+			{
+				SetValue(HasExceptionProperty, value);
+			}
+		}
+
+		// Using a DependencyProperty as the backing store for HasException.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty HasExceptionProperty =
+			DependencyProperty.Register("HasException", typeof(bool), typeof(TileConfigView), new PropertyMetadata(OnHasExceptionChanged));
+
+		static void OnHasExceptionChanged(DependencyObject source, DependencyPropertyChangedEventArgs args)
+		{
+			TileConfigView sender = (TileConfigView)source;
+			sender.Show((bool)args.NewValue);
+		}
+
+		Subject<bool> _ToolTipShow;
+		Subject<bool> ToolTipShow
+		{
+			get
+			{
+				if(_ToolTipShow == null)
+				{
+					_ToolTipShow = new Subject<bool>();
+					_ToolTipShow.Throttle(TimeSpan.FromMilliseconds(5000))
+								.ObserveOn(SynchronizationContext.Current)
+								.Subscribe(o => errorTooltip.IsOpen = false);
+					_ToolTipShow
+						.ObserveOn(SynchronizationContext.Current)
+						.Subscribe(o => errorTooltip.IsOpen = o);
+				}
+				return _ToolTipShow;
+			}
+		}
+		private void Show(bool value)
+		{
+			ToolTipShow.OnNext(value);
+		}
 
 		public bool IsSelected
 		{
