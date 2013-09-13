@@ -30,17 +30,21 @@ namespace GestSpace
 		{
 			if(_IsLocked == null)
 			{
-				var replay = listener
+				var handIsPresent = listener
 							.Frames()
 							.SelectMany(f => f.Hands)
 							.Where(h => h.Fingers.Count >= 4)
-							.Select(s => true)
-							.Timeout(TimeSpan.FromMilliseconds(200), Observable.Return(false).Take(1))
-							.Repeat()
-							.DistinctUntilChanged()
-							.Replay(1);
-				replay.Connect();
-				_IsLocked = replay;
+							.Select(s => true);
+				var handIsAbsent = handIsPresent
+									.Throttle(TimeSpan.FromMilliseconds(200));
+
+				var handPresence =
+						handIsPresent
+								   .Merge(handIsAbsent.Select(o => false))
+								   .DistinctUntilChanged()
+								   .Replay(1);
+				handPresence.Connect();
+				_IsLocked = handPresence;
 			}
 			return _IsLocked;
 		}
